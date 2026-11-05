@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tombola de l'Arbre de Noël</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#f3efe6; --paper:#fffdf8; --ink:#1f2a24; --muted:#5d6a62; --line:#d9d2c3;
+  --pine:#1d4d3a; --pine-soft:#e2ece5; --ribbon:#b3322b; --ribbon-soft:#f6e1dc; --gold:#b88a2e;
+  --f-display:"Young Serif",Georgia,serif;
+  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#121a16; --paper:#1a2520; --ink:#ece7dc; --muted:#a3ada6; --line:#2e3d35;
+  --pine:#7fc4a2; --pine-soft:#1f3329; --ribbon:#ef7d70; --ribbon-soft:#3a2321; --gold:#d9b25f; color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+[hidden]{display:none!important}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+header{display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ribbon);font-weight:700}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,8vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.2;margin:0;text-wrap:balance}
+p{margin:0}
+.muted{color:var(--muted)} .small{font-size:14px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;list-style:none;margin:0;padding:0}
+.steps li{border-top:3px solid var(--line);padding-top:8px;font-size:13px;color:var(--muted);min-width:0}
+.steps li b{display:block;color:var(--ink);font-weight:600;font-size:14px}
+.steps li.on{border-color:var(--ribbon)} .steps li.done{border-color:var(--pine)}
+.tag{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:16px}
+.tag::before{content:"";position:absolute;top:14px;right:16px;width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+form{display:flex;flex-direction:column;gap:14px}
+label{font-weight:600;font-size:14px;display:flex;flex-direction:column;gap:6px}
+input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;width:100%}
+input:focus-visible{outline:2px solid var(--pine);outline-offset:1px;border-color:var(--pine)}
+fieldset{border:0;padding:0;margin:0}
+legend{font-weight:600;font-size:14px;padding:0;margin-bottom:8px}
+.kw-grid{display:grid;gap:8px}
+.kw-row{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px}
+.kw-row span{font-family:var(--f-mono);font-size:13px;color:var(--muted);text-align:center}
+button{font:inherit;font-weight:700;font-size:16px;border:0;border-radius:999px;padding:14px 20px;cursor:pointer;background:var(--ribbon);color:var(--paper);width:100%}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600;width:auto;padding:10px 16px}
+button:disabled{opacity:.55;cursor:default}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.msg{font-size:14px;padding:10px 12px;border-radius:10px;background:var(--ribbon-soft)}
+.ticket{display:flex;align-items:center;justify-content:space-between;gap:12px;border:2px dashed var(--pine);border-radius:12px;padding:14px 16px;background:var(--pine-soft)}
+.ticket .num{font-family:var(--f-mono);font-weight:700;font-size:40px;letter-spacing:.06em;color:var(--pine);line-height:1}
+.ticket small{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:500}
+.drawn{border:2px solid var(--ribbon);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.drawn .who{font-family:var(--f-display);font-size:30px;line-height:1.1}
+.drawn .gnum{font-family:var(--f-mono);font-weight:700;font-size:15px;color:var(--ribbon)}
+.bar{height:14px;border-radius:999px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pine);border-radius:999px;transition:width .6s ease}
+.row{display:flex;justify-content:space-between;font-size:14px;font-variant-numeric:tabular-nums;gap:8px}
+.count{font-family:var(--f-mono);font-size:22px;font-weight:700;color:var(--pine)}
+.wall{display:grid;gap:10px}
+.wall .chips{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Arbre de Noël</span>
+    <h1>Tombola des cadeaux</h1>
+    <p class="muted">Inscris-toi avec 5 indices sur le cadeau qui te ferait plaisir, puis tire au sort la personne à qui tu offriras le tien.</p>
+  </header>
+
+  <ol class="steps">
+    <li id="st1"><b>1. Inscription</b><span id="st1d"></span></li>
+    <li id="st2"><b>2. Tirage</b><span id="st2d"></span></li>
+    <li id="st3"><b>3. Indices</b><span id="st3d"></span></li>
+  </ol>
+
+  <section class="tag" id="main"><h2>Chargement…</h2><p class="muted">Récupération des inscriptions.</p></section>
+
+  <section class="tag" id="progressBox" hidden>
+    <h2>Tirages effectués</h2>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="barFill"></i></div>
+    <div class="row"><span id="progLabel"></span><span id="progPct"></span></div>
+    <p class="small muted" id="progNote"></p>
+  </section>
+
+  <section class="tag" id="wallBox" hidden>
+    <h2>Tous les indices</h2>
+    <p class="small muted">Juste les mots clés, sans les noms. À toi de deviner.</p>
+    <div class="wall" id="wall"></div>
+  </section>
+</div>
+
+<script type="module">
+/* =================== À MODIFIER =================== */
+// 1) Les dates (heure de Paris). Les inscriptions durent 24 h à partir de INSCRIPTIONS.
+const DATES = {
+  INSCRIPTIONS: "2026-12-01T18:00:00+01:00",
+  TIRAGE:       "2026-12-03T18:00:00+01:00",
+  INDICES:      "2026-12-20T18:00:00+01:00",
+};
+// 2) La configuration de ton projet Firebase (voir README).
+const firebaseConfig = {
+  apiKey: "A_REMPLIR",
+  authDomain: "A_REMPLIR",
+  projectId: "A_REMPLIR",
+  storageBucket: "A_REMPLIR",
+  messagingSenderId: "A_REMPLIR",
+  appId: "A_REMPLIR",
+};
+/* ================================================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, doc, onSnapshot, getDoc, getDocs, setDoc, runTransaction, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const H = 3600e3;
+const T = { p1:new Date(DATES.INSCRIPTIONS).getTime(), p2:new Date(DATES.TIRAGE).getTime(), p3:new Date(DATES.INDICES).getTime() };
+T.p1e = T.p1 + 24*H;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = t => new Date(t).toLocaleString("fr-FR",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
+const fmtShort = t => new Date(t).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}) + " " + new Date(t).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
+const store = { get(k){ try{return localStorage.getItem(k);}catch(e){return null;} }, set(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
+const chips = kws => `<div class="chips">${(kws||[]).map(k=>`<span class="chip">${esc(k)}</span>`).join("")}</div>`;
+
+function phase(){ const n=Date.now();
+  if(n<T.p1) return "before"; if(n<T.p1e) return "register"; if(n<T.p2) return "wait"; return "draw"; }
+
+const S = { parts:{}, draws:0, loaded:false, result:null, err:"", busy:false, view:"" };
+
+if(firebaseConfig.apiKey === "A_REMPLIR"){
+  $("main").innerHTML = `<h2>Configuration manquante</h2><p class="muted">Colle la configuration Firebase en haut du fichier index.html (voir README).</p>`;
+  throw new Error("firebaseConfig manquant");
+}
+const db = getFirestore(initializeApp(firebaseConfig));
+
+// --------- rendu ---------
+function render(){
+  const ph = phase(), n = Date.now();
+  $("st1d").textContent = fmtShort(T.p1); $("st2d").textContent = fmtShort(T.p2); $("st3d").textContent = fmtShort(T.p3);
+  $("st1").className = ph==="register" ? "on" : n>=T.p1e ? "done" : "";
+  $("st2").className = ph==="draw" ? (prog().full ? "done" : "on") : "";
+  $("st3").className = n>=T.p3 ? "done" : "";
+  renderMain(ph); renderProgress(ph); renderWall();
+}
+const partList = () => Object.values(S.parts);
+const myNum = () => store.get("tombola-num");
+function prog(){ const total=partList().length, done=Math.min(S.draws,total); return {total,done,full:total>1&&done>=total}; }
+
+function setView(v, html){ S.view=v; $("main").innerHTML=html; }
+
+function ticketHTML(p){
+  return `<h2>Bonjour ${esc(p.name)}</h2>
+    <div class="ticket"><div><small>Ton numéro</small><div class="num">${esc(p.num)}</div></div>
+    <button type="button" class="ghost" data-copy="${esc(p.num)}">Copier</button></div>
+    ${chips(p.keywords)}`;
+}
+
+function renderMain(ph){
+  if(!S.loaded) return;
+  const mine = S.parts[myNum()];
+  if(ph==="before") return setView("before", `<h2>Les inscriptions ouvrent ${esc(fmt(T.p1))}</h2><p class="muted">Tu auras 24 heures pour t'inscrire avec ton prénom et 5 indices.</p>`);
+  if(ph==="register"){
+    if(mine) return setView("ticket", ticketHTML(mine) + `<p class="small muted">Inscription enregistrée. Note bien ce numéro : il te servira pour le tirage ${esc(fmt(T.p2))}.</p>`);
+    if(S.view==="form") return;
+    setView("form", `<h2>Je participe</h2>
+      <p class="small muted">Fermeture des inscriptions ${esc(fmt(T.p1e))}.</p>
+      <form id="regForm" novalidate>
+        <label for="regName">Prénom<input id="regName" autocomplete="given-name" maxlength="30" placeholder="Ex. Camille"></label>
+        <fieldset><legend>5 mots clés sur le cadeau que tu souhaites</legend>
+          <div class="kw-grid">${[1,2,3,4,5].map(i=>`<div class="kw-row"><span>${i}</span><input id="kw${i}" maxlength="40" aria-label="Mot clé ${i}" placeholder="${["livre","chocolat","cosy","musique","bleu"][i-1]}"></div>`).join("")}</div>
+        </fieldset>
+        <p class="msg" id="regMsg" hidden></p>
+        <button type="submit" id="regBtn">Je participe</button>
+      </form>`);
+    $("regForm").addEventListener("submit", onRegister);
+    return;
+  }
+  if(ph==="wait"){
+    const n = partList().length;
+    return setView("wait", (mine ? ticketHTML(mine) : `<h2>Inscriptions closes</h2>`) +
+      `<p class="muted"><span class="count">${n}</span> participant${n>1?"s":""}. Le tirage commence ${esc(fmt(T.p2))}.</p>`);
+  }
+  // tirage
+  if(S.result){
+    const r=S.result;
+    return setView("result", `<h2>Tu offres un cadeau à</h2>
+      <div class="drawn"><div class="who">${esc(r.name)}</div>${chips(r.keywords)}
+      <div class="gnum">Écris le n° ${esc(r.num)} sur l'emballage</div></div>
+      <p class="small muted">Garde le secret. Tu peux revenir avec ton numéro pour revoir ce tirage.</p>`);
+  }
+  if(S.view!=="draw"){
+    setView("draw", `<h2>À toi de tirer</h2>
+      <p class="muted">Entre ton numéro pour découvrir la personne à qui tu fais un cadeau.</p>
+      <form id="drawForm" novalidate>
+        <label for="drawNum">Mon numéro<input id="drawNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"></label>
+        <p class="msg" id="drawMsg" hidden></p>
+        <button type="submit" id="drawBtn">Tirer au sort</button>
+      </form>`);
+    $("drawForm").addEventListener("submit", onDraw);
+  }
+  $("drawMsg").hidden = !S.err; $("drawMsg").textContent = S.err; $("drawBtn").disabled = S.busy;
+  $("drawBtn").textContent = S.busy ? "Tirage…" : "Tirer au sort";
+}
+
+function renderProgress(ph){
+  $("progressBox").hidden = ph!=="draw"; if(ph!=="draw") return;
+  const {total,done,full}=prog(), pct = total ? Math.round(done/total*100) : 0;
+  $("barFill").style.width = pct+"%"; $("bar").setAttribute("aria-valuenow", pct);
+  $("progLabel").textContent = `${done} sur ${total} participant${total>1?"s":""}`;
+  $("progPct").textContent = pct+" %";
+  $("progNote").textContent = full ? "Tout le monde a tiré quelqu'un. Chacun recevra un seul cadeau." : "La barre se remplit à chaque tirage.";
+}
+
+function renderWall(){
+  const ps = partList();
+  $("wallBox").hidden = Date.now()<T.p3 || !ps.length; if($("wallBox").hidden) return;
+  const h=s=>{let x=7;for(const c of String(s))x=(x*31+c.charCodeAt(0))%100003;return x;};
+  ps.sort((a,b)=>h(a.num+"x")-h(b.num+"x"));
+  $("wall").innerHTML = ps.map(p=>chips(p.keywords)).join("");
+}
+
+// --------- actions ---------
+async function onRegister(ev){
+  ev.preventDefault();
+  const msg=$("regMsg"), btn=$("regBtn");
+  const name=$("regName").value.trim(), keywords=[1,2,3,4,5].map(i=>$("kw"+i).value.trim());
+  const fail = t => { msg.hidden=false; msg.textContent=t; btn.disabled=false; btn.textContent="Je participe"; };
+  if(!name || keywords.some(k=>!k)) return fail("Remplis ton prénom et les 5 mots clés.");
+  if(phase()!=="register") return fail("Les inscriptions sont closes.");
+  btn.disabled=true; btn.textContent="Inscription…";
+  try{
+    let num=null;
+    for(let i=0;i<20 && !num;i++){
+      const candidate = String(100+Math.floor(Math.random()*900));
+      const ref = doc(db,"participants",candidate);
+      const ok = await runTransaction(db, async tx => {
+        const s = await tx.get(ref); if(s.exists()) return false;
+        tx.set(ref, { num:candidate, name, keywords, at:serverTimestamp() }); return true;
+      });
+      if(ok) num=candidate;
+    }
+    if(!num) return fail("Impossible d'attribuer un numéro. Réessaie.");
+    store.set("tombola-num", num);
+    S.parts[num] = { num, name, keywords };
+    render();
+  }catch(e){ console.error(e); fail("L'inscription n'est pas passée. Vérifie ta connexion et réessaie."); }
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+async function getAssignment(){
+  const ref = doc(db,"tirage","attribution");
+  const snap = await getDoc(ref);
+  if(snap.exists()) return snap.data().order;
+  const nums = (await getDocs(collection(db,"participants"))).docs.map(d=>d.id);
+  // Une seule boucle : chacun offre au suivant. Personne ne se tire lui-même, chacun reçoit un seul cadeau.
+  const proposed = shuffle(nums);
+  return runTransaction(db, async tx => {
+    const s = await tx.get(ref);
+    if(s.exists()) return s.data().order;      // quelqu'un l'a créée juste avant nous
+    tx.set(ref, { order:proposed, at:serverTimestamp() });
+    return proposed;
+  });
+}
+
+async function onDraw(ev){
+  ev.preventDefault(); if(S.busy) return;
+  const val = $("drawNum").value.trim(); S.err="";
+  if(!/^\d{3}$/.test(val)){ S.err="Entre ton numéro à 3 chiffres."; return render(); }
+  if(!S.parts[val]){ S.err="Ce numéro n'existe pas. Vérifie-le."; return render(); }
+  if(partList().length<2){ S.err="Il faut au moins 2 participants."; return render(); }
+  S.busy=true; render();
+  try{
+    const order = await getAssignment();
+    const i = order.indexOf(val);
+    if(i<0) throw new Error("absent");
+    const target = S.parts[order[(i+1)%order.length]];
+    const dref = doc(db,"tirages",val);
+    if(!(await getDoc(dref)).exists()) await setDoc(dref, { at:serverTimestamp() });
+    store.set("tombola-num", val);
+    S.result = { name:target.name, keywords:target.keywords, num:target.num };
+  }catch(e){
+    console.error(e);
+    S.err = e.message==="absent" ? "Ce numéro n'était pas dans la liste du tirage. Préviens l'organisateur." : "Le tirage n'a pas abouti. Vérifie ta connexion et réessaie.";
+  }
+  S.busy=false; render();
+}
+
+document.addEventListener("click", async ev=>{
+  const b = ev.target.closest("[data-copy]"); if(!b) return;
+  try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copié"; }catch(e){ b.textContent=b.dataset.copy; }
+});
+
+// --------- données en direct ---------
+const offline = setTimeout(()=>{ if(!S.loaded) $("main").innerHTML=`<h2>Connexion impossible</h2><p class="muted">Les données ne répondent pas. Vérifie ta connexion puis recharge la page.</p>`; }, 10000);
+onSnapshot(collection(db,"participants"), s => {
+  const o={}; s.forEach(d=>o[d.id]=d.data()); S.parts=o; S.loaded=true; clearTimeout(offline); render();
+}, e => { console.error(e); $("main").innerHTML=`<h2>Accès refusé</h2><p class="muted">Vérifie les règles Firestore (voir README).</p>`; });
+onSnapshot(collection(db,"tirages"), s => { S.draws=s.size; render(); }, e=>console.error(e));
+
+let lastPhase = phase();
+setInterval(()=>{ const p=phase(); if(p!==lastPhase){ lastPhase=p; S.view=""; } render(); }, 30000);
+</script>
+</body>
+</html>
