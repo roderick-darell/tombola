@@ -204,21 +204,19 @@ footer{text-align:center;font-size:13px;color:var(--muted);padding-top:8px}
 /* =================== À MODIFIER =================== */
 // Colle ici la configuration de ton projet Firebase.
 const firebaseConfig = {
-
-  apiKey: "AIzaSyCTn_EzHJYKKA7KrifFtnLI1470k6f1wOQ",
-
-  authDomain: "darell-3b402.firebaseapp.com",
-
-  projectId: "darell-3b402",
-
-  storageBucket: "darell-3b402.firebasestorage.app",
-
-  messagingSenderId: "680704196983",
-
-  appId: "1:680704196983:web:d1757c4ecd3548d52b6172"
-
+  apiKey: "A_REMPLIR",
+  authDomain: "A_REMPLIR",
+  projectId: "A_REMPLIR",
+  storageBucket: "A_REMPLIR",
+  messagingSenderId: "A_REMPLIR",
+  appId: "A_REMPLIR",
 };
 
+// Options. Le code des fonctions désactivées reste présent : passe à true pour les rallumer.
+const OPT = {
+  autrePersonne: false,      // false : un seul participant par téléphone (pas d'inscription, tirage ou pronostic pour quelqu'un d'autre)
+  modifierPronostics: false, // false : une fois envoyés, les pronostics sont définitifs (bloqué aussi dans les règles Firestore)
+};
 /* ================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -253,7 +251,7 @@ function renderTimeline(){
     <div class="body"><b>${esc(p.t)}${i===cur?`<span class="tagnow">En cours</span>`:""}</b><p class="d">${esc(p.d)}</p></div></li>`).join("");
 }
 
-const S = { phase:"inscription", parts:{}, order:null, draws:0, pfaits:0, pronos:null, loaded:false,
+const S = { phase:"inscription", parts:{}, order:null, draws:0, pfaits:0, faits:new Set(), pronos:null, loaded:false,
   result:null, err:"", busy:false, view:"", pnum:null,
   admin:false, adminWanted: location.hash === "#admin", confirm:null, adminMsg:"" };
 renderTimeline();
@@ -269,6 +267,9 @@ const auth = getAuth(app);
 const partList = () => Object.values(S.parts).sort((a,b)=>(a.at?.seconds||0)-(b.at?.seconds||0));
 const byName = () => Object.values(S.parts).sort((a,b)=>a.name.localeCompare(b.name,"fr"));
 const myNum = () => store.get("tombola-num");
+// Numéro verrouillé : ce téléphone est déjà lié à un participant existant.
+const lockedNum = () => { const n=myNum(); return !OPT.autrePersonne && n && S.parts[n] ? n : null; };
+const isSent = n => S.faits.has(n) || !!store.get("tombola-prono-sent-"+n);
 const letter = i => { let s=""; i++; while(i>0){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; };
 function wallSets(){
   const h=s=>{let x=7;for(const c of String(s))x=(x*31+c.charCodeAt(0))%100003;return x;};
@@ -306,7 +307,7 @@ function renderMain(){
 function mainInscription(){
   const mine = S.parts[myNum()];
   if(mine) return setView("ticket", ticketHTML(mine) + `<p class="small muted">Inscription enregistrée. Garde ce numéro : il te servira pour le tirage et les pronostics.</p>
-    <button type="button" class="ghost" data-other>Inscrire une autre personne sur ce téléphone</button>`);
+    ${OPT.autrePersonne?`<button type="button" class="ghost" data-other>Inscrire une autre personne sur ce téléphone</button>`:""}`);
   if(S.view==="form") return;
   setView("form", `<h2>Je participe</h2>
     <form id="regForm" novalidate>
@@ -327,13 +328,13 @@ function mainDraw(){
       <div class="drawn"><div class="who">${esc(r.name)}</div>${chips(r.keywords)}
       <div class="gnum">Écris le n° ${esc(r.num)} sur l'emballage</div></div>
       <p class="small muted">Garde le secret : les autres devront deviner que c'est toi.</p>
-      <button type="button" class="ghost" data-other>Tirer pour une autre personne</button>`);
+      ${OPT.autrePersonne?`<button type="button" class="ghost" data-other>Tirer pour une autre personne</button>`:""}`);
   }
   if(S.view!=="draw"){
     setView("draw", `<h2>À toi de tirer</h2>
       <p class="muted">Entre ton numéro pour découvrir la personne à qui tu fais un cadeau.</p>
       <form id="drawForm" novalidate>
-        <label for="drawNum">Mon numéro<input id="drawNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"></label>
+        <label for="drawNum">Mon numéro<input id="drawNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"${lockedNum()?" readonly":""}></label>
         <p class="msg" id="drawMsg" hidden></p>
         <button type="submit" class="red" id="drawBtn">Tirer au sort</button>
       </form>`);
@@ -350,7 +351,7 @@ function mainPronostics(){
     setView("pronoLogin", `<h2>À toi de jouer</h2>
       <p class="muted">Reconstitue la tombola : à qui appartient chaque lot d'indices, et qui a offert à qui. Un point par bonne réponse.</p>
       <form id="pLogin" novalidate>
-        <label for="pNum">Mon numéro<input id="pNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"></label>
+        <label for="pNum">Mon numéro<input id="pNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"${lockedNum()?" readonly":""}></label>
         <p class="msg" id="pMsg" hidden></p>
         <button type="submit" class="red">Commencer mes pronostics</button>
       </form>`);
@@ -358,13 +359,14 @@ function mainPronostics(){
       ev.preventDefault();
       const v=$("pNum").value.trim();
       if(!S.parts[v]){ const m=$("pMsg"); m.hidden=false; m.textContent="Ce numéro n'existe pas. Vérifie-le."; return; }
+      if(lockedNum() && v!==lockedNum()){ const m=$("pMsg"); m.hidden=false; m.textContent="Ce téléphone est lié au numéro "+lockedNum()+"."; return; }
       S.pnum=v; store.set("tombola-num", v); S.view="";
-      store.get("tombola-prono-sent-"+v) ? pronoSent() : pronoForm();
+      isSent(v) ? pronoSent() : pronoForm();
       render(); window.scrollTo(0,0);
     });
     return;
   }
-  store.get("tombola-prono-sent-"+num) ? pronoSent() : pronoForm();
+  isSent(num) ? pronoSent() : pronoForm();
 }
 
 function pronoForm(){
@@ -374,7 +376,8 @@ function pronoForm(){
     .map(p=>`<option value="${esc(p.num)}"${sel===p.num?" selected":""}>${esc(displayName(p))}</option>`).join("");
   const sets = wallSets();
   setView("pronoForm", `<h2>Pronostics de ${esc(me.name)}</h2>
-    <p class="small muted">Tu peux laisser des cases vides. Tu pourras modifier tes réponses tant que les résultats ne sont pas publiés.</p>
+    <p class="small muted">Un point par bonne réponse. En cas d'égalité, les indices justes départagent, puis l'heure d'envoi.</p>
+    ${OPT.modifierPronostics?"":`<p class="msg info">Attention : une fois envoyés, tes pronostics sont définitifs.</p>`}
     <form id="pForm" novalidate>
       <fieldset><legend>1. À qui appartient chaque lot d'indices ?</legend>
         ${sets.map(s=>`<div class="set"><span class="l">${s.L}</span><div class="c">${chips(s.keywords)}
@@ -394,8 +397,8 @@ function pronoSent(){
   const me=S.parts[S.pnum];
   setView("pronoSent", `<h2>Pronostics envoyés</h2>
     <p class="msg ok">Merci ${esc(me?.name||"")} ! Rendez-vous à la publication des résultats pour voir ton score.</p>
-    <button type="button" class="ghost" data-edit-prono>Modifier mes réponses</button>
-    <button type="button" class="ghost" data-other>Pronostics pour une autre personne</button>`);
+    ${OPT.modifierPronostics?`<button type="button" class="ghost" data-edit-prono>Modifier mes réponses</button>`:""}
+    ${OPT.autrePersonne?`<button type="button" class="ghost" data-other>Pronostics pour une autre personne</button>`:""}`);
 }
 
 function renderNames(){
@@ -440,13 +443,15 @@ function renderResults(){
   if(S.phase!=="resultats" || !S.loaded){ box.hidden=true; return; }
   box.hidden=false;
   const n=partList().length, max=n*2, me=myNum();
-  const rows=(S.pronos||[]).filter(p=>S.parts[p.num]).map(p=>({num:p.num, name:displayName(S.parts[p.num]), ...scoreOf(p)})).sort((a,b)=>b.t-a.t || a.name.localeCompare(b.name,"fr"));
-  let rank=0, prev=null;
-  rows.forEach((r,i)=>{ if(r.t!==prev){ rank=i+1; prev=r.t; } r.rank=rank; });
+  // Départage : 1) score total, 2) nombre d'indices bien attribués, 3) le premier à avoir envoyé ses pronostics.
+  const when = p => p.at ? (p.at.seconds*1e9 + (p.at.nanoseconds||0)) : Number.MAX_VALUE;
+  const rows=(S.pronos||[]).filter(p=>S.parts[p.num]).map(p=>({num:p.num, name:displayName(S.parts[p.num]), w:when(p), ...scoreOf(p)}))
+    .sort((a,b)=>b.t-a.t || b.k-a.k || a.w-b.w || a.num.localeCompare(b.num));
+  rows.forEach((r,i)=>{ r.rank=i+1; });
   const o=S.order||[];
   box.innerHTML = `
     <h2>Classement des pronostics</h2>
-    <p class="small muted">Un point par lot d'indices bien attribué et par donneur bien trouvé, sur ${max} points.</p>
+    <p class="small muted">Un point par lot d'indices bien attribué et par donneur bien trouvé, sur ${max} points. En cas d'égalité, celui qui a le plus d'indices justes passe devant, puis le premier à avoir envoyé ses pronostics.</p>
     ${S.pronos===null ? `<p class="muted">Chargement du classement…</p>` : rows.length ? `<ol class="rank">${rows.map(r=>`<li class="p${r.rank}${r.num===me?" me":""}">
         <span class="pos">${r.rank}</span><span class="nm">${esc(r.name)}<br><span class="small muted">${r.k} indice${r.k>1?"s":""} · ${r.g} cadeau${r.g>1?"x":""}</span></span>
         <span class="sc">${r.t}/${max}</span></li>`).join("")}</ol>` : `<p class="muted">Personne n'a envoyé de pronostics.</p>`}
@@ -490,7 +495,8 @@ function renderAdmin(){
   box.dataset.v="panel";
   const n=partList().length, d=Math.min(S.draws,n), pf=Math.min(S.pfaits,n);
   const next=NEXT[S.phase], back=BACK[S.phase], c=S.confirm;
-  const action = c ? (c.dir==="next"?next:back) : null;
+  const RESET = { to:"__reset__", warn:()=>`Tout sera effacé : les ${n} inscrits, le tirage, les pronostics. Le site revient à l'étape Inscription. Impossible d'annuler.` };
+  const action = c ? (c.dir==="next"?next:c.dir==="back"?back:RESET) : null;
   box.innerHTML=`<div class="row"><h2>Espace organisateur</h2><button type="button" class="ghost small" id="logout">Déconnexion</button></div>
     <p class="small muted">Étape actuelle : <b>${esc(PHASES[PIDX(S.phase)].t)}</b>. ${n} inscrit${n>1?"s":""}, ${d} tirage${d>1?"s":""}, ${pf} pronostic${pf>1?"s":""}.
     ${S.phase==="inscription"?" La croix à côté d'un prénom retire un doublon.":""}</p>
@@ -500,11 +506,13 @@ function renderAdmin(){
           ${next?`<button type="button" class="fir" id="goNext" ${S.phase==="inscription"&&n<2?"disabled":""}>${esc(next.label)}</button>`:""}
           ${S.phase==="inscription"&&n<2?`<p class="small muted">Il faut au moins 2 inscrits pour lancer le tirage.</p>`:""}
           ${back?`<button type="button" class="ghost" id="goBack">${esc(back.label)}</button>`:""}
+          <button type="button" class="red" id="goReset">Tout remettre à zéro</button>
         </div>`}
     ${S.adminMsg?`<p class="msg">${esc(S.adminMsg)}</p>`:""}`;
   $("logout").onclick = () => signOut(auth);
-  if(action){ $("cfYes").onclick = () => doPhase(action.to); $("cfNo").onclick = () => { S.confirm=null; render(); }; }
+  if(action){ $("cfYes").onclick = () => action.to==="__reset__" ? doReset() : doPhase(action.to); $("cfNo").onclick = () => { S.confirm=null; render(); }; }
   else {
+    $("goReset").onclick = () => { S.confirm={dir:"reset"}; S.adminMsg=""; render(); };
     if($("goNext")) $("goNext").onclick = () => { S.confirm={dir:"next"}; S.adminMsg=""; render(); };
     if($("goBack")) $("goBack").onclick = () => { S.confirm={dir:"back"}; S.adminMsg=""; render(); };
   }
@@ -528,6 +536,24 @@ async function doPhase(target){
     batch.set(doc(db,"config","etat"), { phase:target });
     await batch.commit();
   }catch(e){ console.error(e); S.adminMsg="Action refusée. Vérifie que tu es connecté avec l'e-mail inscrit dans les règles Firestore."; }
+  render();
+}
+
+async function doReset(){
+  S.confirm=null; S.adminMsg="Remise à zéro en cours…"; render();
+  try{
+    const refs=[doc(db,"tirage","attribution"), doc(db,"config","etat")];
+    for(const name of ["participants","tirages","pronostics","pronostics_faits"])
+      (await getDocs(collection(db,name))).forEach(d=>refs.push(d.ref));
+    for(let i=0;i<refs.length;i+=400){
+      const batch=writeBatch(db);
+      refs.slice(i,i+400).forEach(r=>batch.delete(r));
+      await batch.commit();
+    }
+    try{ Object.keys(localStorage).filter(k=>k.startsWith("tombola-")).forEach(k=>localStorage.removeItem(k)); }catch(e){}
+    S.result=null; S.pnum=null; S.view="";
+    S.adminMsg="C'est fait : la tombola repart de zéro.";
+  }catch(e){ console.error(e); S.adminMsg="Remise à zéro refusée. Vérifie que tu es connecté avec l'e-mail inscrit dans les règles Firestore."; }
   render();
 }
 
@@ -569,6 +595,7 @@ async function onDraw(ev){
   const val = $("drawNum").value.trim(); S.err="";
   if(!/^\d{3}$/.test(val)){ S.err="Entre ton numéro à 3 chiffres."; return render(); }
   if(!S.parts[val]){ S.err="Ce numéro n'existe pas. Vérifie-le."; return render(); }
+  if(lockedNum() && val!==lockedNum()){ S.err="Ce téléphone est lié au numéro "+lockedNum()+". Tu ne peux tirer que pour toi."; return render(); }
   S.busy=true; render();
   try{
     const snap = await getDoc(doc(db,"tirage","attribution"));
@@ -591,6 +618,7 @@ async function onDraw(ev){
 async function onPronostics(ev){
   ev.preventDefault();
   const num=S.pnum, btn=$("pfBtn"), msg=$("pfMsg");
+  if(!OPT.modifierPronostics && isSent(num)){ S.view=""; pronoSent(); render(); return; }
   const kw={}, gift={};
   for(const p of Object.values(S.parts)){
     const a=$("kw-"+p.num)?.value; if(a) kw[p.num]=a;
@@ -614,11 +642,11 @@ async function onPronostics(ev){
 document.addEventListener("click", async ev=>{
   const c = ev.target.closest("[data-copy]");
   if(c){ try{ await navigator.clipboard.writeText(c.dataset.copy); c.textContent="Copié"; }catch(e){ c.textContent=c.dataset.copy; } return; }
-  if(ev.target.closest("[data-other]")){
+  if(ev.target.closest("[data-other]") && OPT.autrePersonne){
     store.del("tombola-num"); S.pnum=null;
     S.result=null; S.err=""; S.view=""; render(); window.scrollTo(0,0); return;
   }
-  if(ev.target.closest("[data-edit-prono]")){ S.view=""; pronoForm(); render(); return; }
+  if(ev.target.closest("[data-edit-prono]") && OPT.modifierPronostics){ S.view=""; pronoForm(); render(); return; }
   const d = ev.target.closest("[data-del]");
   if(d && S.admin){
     if(d.dataset.sure!=="1"){ d.dataset.sure="1"; d.textContent="Retirer ?"; d.style.fontSize="13px"; return; }
@@ -648,7 +676,7 @@ onSnapshot(collection(db,"participants"), s => {
 }, e => { console.error(e); $("main").innerHTML=`<h2>Accès refusé</h2><p class="muted">Vérifie les règles Firestore (voir README).</p>`; });
 onSnapshot(doc(db,"tirage","attribution"), s => { S.order = s.exists() ? s.data().order : null; render(); }, e=>console.error(e));
 onSnapshot(collection(db,"tirages"), s => { S.draws=s.size; render(); }, e=>console.error(e));
-onSnapshot(collection(db,"pronostics_faits"), s => { S.pfaits=s.size; render(); }, e=>console.error(e));
+onSnapshot(collection(db,"pronostics_faits"), s => { S.faits=new Set(s.docs.map(d=>d.id)); S.pfaits=s.size; render(); }, e=>console.error(e));
 onAuthStateChanged(auth, u => { S.admin = !!u; $("adminBox").dataset.v=""; watchPronos(); render(); });
 </script>
 </body>
