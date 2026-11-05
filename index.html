@@ -3,135 +3,214 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Tombola de l'Arbre de Noël</title>
+<meta name="theme-color" content="#0d1730">
+<title>Tombola Duisburg</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Albert+Sans:wght@400;500;600;700;800&family=Martian+Mono:wght@500;700&display=swap">
 <style>
+/* Une baraque à billets de marché de Noël, la nuit : bleu nuit, guirlande d'ampoules, billets rouges perforés. */
 :root{
-  --bg:#f3efe6; --paper:#fffdf8; --ink:#1f2a24; --muted:#5d6a62; --line:#d9d2c3;
-  --pine:#1d4d3a; --pine-soft:#e2ece5; --ribbon:#b3322b; --ribbon-soft:#f6e1dc; --gold:#b88a2e;
-  --f-display:"Young Serif",Georgia,serif;
-  --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
-  --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
-  color-scheme:light;
+  --night:#0d1730; --night-2:#132246; --panel:#17284f; --line:#2a3f74;
+  --text:#f3f5fc; --muted:#a8b4d4;
+  --bulb:#ffd23f; --red:#e63946; --red-deep:#b71d2a; --fir:#2fbf71; --ice:#9fd8ff;
+  --f-sign:"Bungee","Arial Black",Impact,sans-serif;
+  --f-body:"Albert Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-num:"Martian Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
 }
-@media (prefers-color-scheme:dark){:root{
-  --bg:#121a16; --paper:#1a2520; --ink:#ece7dc; --muted:#a3ada6; --line:#2e3d35;
-  --pine:#7fc4a2; --pine-soft:#1f3329; --ribbon:#ef7d70; --ribbon-soft:#3a2321; --gold:#d9b25f; color-scheme:dark}}
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5;
+html{-webkit-text-size-adjust:100%;background:var(--night)}
+body{margin:0;min-height:100vh;color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.5;
+  background:
+    radial-gradient(900px 420px at 50% -120px, rgba(255,210,63,.16), transparent 70%),
+    radial-gradient(600px 400px at 100% 40%, rgba(230,57,70,.10), transparent 70%),
+    var(--night);
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  padding-top:calc(24px + env(safe-area-inset-top,0px));padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))}
 [hidden]{display:none!important}
-.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-header{display:flex;flex-direction:column;gap:6px}
-.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ribbon);font-weight:700}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,8vw,40px);line-height:1.1;margin:0;text-wrap:balance}
-h2{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.2;margin:0;text-wrap:balance}
+.wrap{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 p{margin:0}
 .muted{color:var(--muted)} .small{font-size:14px}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;list-style:none;margin:0;padding:0}
-.steps li{border-top:3px solid var(--line);padding-top:8px;font-size:14px;font-weight:600;color:var(--muted);min-width:0}
-.steps li.on{border-color:var(--ribbon);color:var(--ink)} .steps li.done{border-color:var(--pine)}
-.tag{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:16px}
-.tag::before{content:"";position:absolute;top:14px;right:16px;width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
+h2{font-family:var(--f-body);font-weight:800;font-size:22px;line-height:1.2;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h3{font-size:15px;font-weight:800;margin:0;letter-spacing:.06em;text-transform:uppercase;color:var(--bulb)}
+
+/* ---------- guirlande ---------- */
+.lights{position:relative;height:46px;margin:0 -16px;display:flex;justify-content:space-around;align-items:flex-start;overflow:hidden}
+.lights::before{content:"";position:absolute;left:-5%;right:-5%;top:-30px;height:44px;border-bottom:2px solid #33466f;border-radius:0 0 50% 50%}
+.lights span{position:relative;width:12px;height:18px;border-radius:50% 50% 45% 45%;margin-top:14px;background:var(--c);box-shadow:0 0 14px 2px var(--c);animation:twinkle 2.6s ease-in-out infinite;animation-delay:var(--d)}
+.lights span::before{content:"";position:absolute;top:-5px;left:3px;width:6px;height:6px;background:#33466f;border-radius:2px}
+.lights span:nth-child(4n+1){--c:var(--bulb)} .lights span:nth-child(4n+2){--c:var(--red)}
+.lights span:nth-child(4n+3){--c:var(--fir)} .lights span:nth-child(4n){--c:var(--ice)}
+.lights span:nth-child(2n){margin-top:22px}
+.lights span:nth-child(3n){margin-top:18px}
+@keyframes twinkle{0%,100%{opacity:1}50%{opacity:.45;box-shadow:0 0 4px 0 var(--c)}}
+
+/* ---------- en-tête ---------- */
+header{display:flex;flex-direction:column;gap:10px;padding-top:6px}
+.eyebrow{font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--ice)}
+h1{font-family:var(--f-sign);font-weight:400;margin:0;line-height:.95;font-size:clamp(40px,12.5vw,64px);letter-spacing:.01em;color:var(--bulb);
+  text-shadow:0 0 18px rgba(255,210,63,.45),0 3px 0 var(--red-deep)}
+h1 small{display:block;font-size:.5em;color:var(--text);text-shadow:0 2px 0 var(--red-deep);letter-spacing:.04em}
+.lede{font-size:17px;color:var(--text);max-width:46ch}
+
+/* ---------- règles / étapes ---------- */
+.rules{background:var(--night-2);border:1px solid var(--line);border-radius:18px;padding:18px 16px}
+.rules h3{margin-bottom:12px}
+.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.timeline li{display:grid;grid-template-columns:36px 1fr;gap:12px;position:relative;padding-bottom:14px}
+.timeline li:last-child{padding-bottom:0}
+.timeline li::after{content:"";position:absolute;left:17px;top:36px;bottom:2px;width:2px;background:var(--line)}
+.timeline li:last-child::after{display:none}
+.timeline .n{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-sign);font-size:16px;background:var(--panel);border:2px solid var(--line);color:var(--muted)}
+.timeline .body{min-width:0;padding-top:6px}
+.timeline b{display:block;font-weight:800;font-size:16px;color:var(--muted)}
+.timeline .d{font-size:14px;color:var(--muted);margin-top:2px}
+.timeline .tagnow{display:inline-block;margin-left:8px;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--bulb);color:var(--night);padding:2px 8px;border-radius:999px;vertical-align:2px}
+.timeline li.done .n{background:var(--fir);border-color:var(--fir);color:var(--night)}
+.timeline li.done b{color:var(--text)}
+.timeline li.done::after{background:var(--fir)}
+.timeline li.on .n{background:var(--bulb);border-color:var(--bulb);color:var(--night);box-shadow:0 0 0 5px rgba(255,210,63,.18)}
+.timeline li.on b{color:var(--bulb)}
+.timeline li.on .d{color:var(--text)}
+
+/* ---------- cartes ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px 18px;display:flex;flex-direction:column;gap:16px}
+.card.hero{border:2px solid var(--bulb);box-shadow:0 0 0 6px rgba(255,210,63,.08),0 18px 40px rgba(0,0,0,.35)}
+
 form{display:flex;flex-direction:column;gap:14px}
-label{font-weight:600;font-size:14px;display:flex;flex-direction:column;gap:6px}
-input{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 14px;width:100%}
-input:focus-visible{outline:2px solid var(--pine);outline-offset:1px;border-color:var(--pine)}
-fieldset{border:0;padding:0;margin:0}
-legend{font-weight:600;font-size:14px;padding:0;margin-bottom:8px}
-.kw-grid{display:grid;gap:8px}
-.kw-row{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px}
-.kw-row span{font-family:var(--f-mono);font-size:13px;color:var(--muted);text-align:center}
-button{font:inherit;font-weight:700;font-size:16px;border:0;border-radius:999px;padding:14px 20px;cursor:pointer;background:var(--ribbon);color:var(--paper);width:100%}
-button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600}
-button.small{width:auto;padding:10px 16px;font-size:15px}
-button.green{background:var(--pine)}
-button:disabled{opacity:.55;cursor:default}
-button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-.msg{font-size:14px;padding:10px 12px;border-radius:10px;background:var(--ribbon-soft)}
-.msg.ok{background:var(--pine-soft)}
-.ticket{display:flex;align-items:center;justify-content:space-between;gap:12px;border:2px dashed var(--pine);border-radius:12px;padding:14px 16px;background:var(--pine-soft)}
-.ticket .num{font-family:var(--f-mono);font-weight:700;font-size:40px;letter-spacing:.06em;color:var(--pine);line-height:1}
-.ticket small{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+label{font-weight:700;font-size:14px;display:flex;flex-direction:column;gap:6px}
+input,select{font:inherit;font-size:16px;color:var(--text);background:var(--night);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;width:100%}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 52%,calc(100% - 14px) 52%;background-size:6px 6px;background-repeat:no-repeat;padding-right:36px}
+input::placeholder{color:#62709a}
+input:focus-visible,select:focus-visible{outline:2px solid var(--bulb);outline-offset:1px;border-color:var(--bulb)}
+fieldset{border:0;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+legend{font-weight:700;font-size:14px;padding:0;margin-bottom:8px}
+.kw-row{display:grid;grid-template-columns:30px 1fr;align-items:center;gap:8px}
+.kw-row span{font-family:var(--f-num);font-size:13px;color:var(--bulb);text-align:center}
+
+button{font:inherit;font-weight:800;font-size:16px;border:0;border-radius:14px;padding:15px 20px;cursor:pointer;background:var(--bulb);color:var(--night);width:100%;
+  box-shadow:0 4px 0 #b8901a;transition:transform .08s ease, box-shadow .08s ease}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #b8901a}
+button.red{background:var(--red);color:#fff;box-shadow:0 4px 0 var(--red-deep)}
+button.fir{background:var(--fir);color:var(--night);box-shadow:0 4px 0 #1d8a50}
+button.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line);box-shadow:none;font-weight:700}
+button.ghost:active{transform:none}
+button.small{width:auto;padding:9px 14px;font-size:14px}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible{outline:3px solid var(--ice);outline-offset:2px}
+
+.msg{font-size:14px;padding:11px 13px;border-radius:12px;background:rgba(230,57,70,.16);border:1px solid rgba(230,57,70,.4)}
+.msg.ok{background:rgba(47,191,113,.14);border-color:rgba(47,191,113,.4)}
+.msg.info{background:rgba(159,216,255,.10);border-color:rgba(159,216,255,.3)}
+
+/* ---------- billet ---------- */
+.ticket{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:stretch;border-radius:12px;background:var(--red);color:#fff;overflow:hidden;
+  -webkit-mask:radial-gradient(circle 9px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;
+          mask:radial-gradient(circle 9px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 9px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
+.ticket .stub{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--f-sign);font-size:13px;letter-spacing:.2em;padding:12px 10px 12px 16px;background:var(--red-deep);display:grid;place-items:center}
+.ticket .main{padding:14px 16px 14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-left:2px dashed rgba(255,255,255,.5);min-width:0}
+.ticket small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;opacity:.85}
+.ticket .num{font-family:var(--f-num);font-weight:700;font-size:42px;letter-spacing:.08em;line-height:1}
+.ticket button{background:#fff;color:var(--red-deep);box-shadow:none}
+
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
-.chip.me{border-color:var(--pine);color:var(--pine);font-weight:700}
-.chip .x{border:0;background:none;color:var(--ribbon);padding:0 2px;width:auto;font-size:16px;line-height:1}
-.drawn{border:2px solid var(--ribbon);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
-.drawn .who{font-family:var(--f-display);font-size:30px;line-height:1.1}
-.drawn .gnum{font-family:var(--f-mono);font-weight:700;font-size:15px;color:var(--ribbon)}
-.bar{height:14px;border-radius:999px;background:var(--line);overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--pine);border-radius:999px;transition:width .6s ease}
-.row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-variant-numeric:tabular-nums;gap:8px}
-.count{font-family:var(--f-mono);font-size:22px;font-weight:700;color:var(--pine)}
-.wall{display:grid;gap:10px}
-.wall .chips{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
-.admin{border-style:dashed}
+.chip{background:var(--night);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;max-width:100%;overflow-wrap:anywhere}
+.chip.me{border-color:var(--bulb);color:var(--bulb)}
+.chip .x{border:0;background:none;box-shadow:none;color:var(--red);padding:0 2px;width:auto;font-size:17px;line-height:1}
+
+.drawn{border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;background:var(--night);border:2px dashed var(--red)}
+.drawn .who{font-family:var(--f-sign);font-size:34px;line-height:1;color:var(--text)}
+.drawn .gnum{font-family:var(--f-num);font-weight:700;font-size:14px;color:var(--bulb)}
+
+.bar{height:16px;border-radius:999px;background:var(--night);border:1px solid var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:999px;transition:width .7s ease;
+  background:repeating-linear-gradient(-45deg,var(--fir) 0 10px,#27a862 10px 20px)}
+.row{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-variant-numeric:tabular-nums;gap:10px;flex-wrap:wrap}
+.count{font-family:var(--f-num);font-size:24px;font-weight:700;color:var(--bulb)}
+
+.sets{display:grid;gap:10px}
+.set{display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--night)}
+.set .l{font-family:var(--f-sign);font-size:22px;color:var(--bulb);text-align:center;line-height:1.3}
+.set .c{min-width:0;display:flex;flex-direction:column;gap:10px}
+.gift{display:flex;flex-direction:column;gap:6px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--night)}
+.gift b{font-weight:800}
+
+.rank{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.rank li{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--night);border:1px solid var(--line)}
+.rank li.me{border-color:var(--bulb)}
+.rank .pos{font-family:var(--f-sign);font-size:18px;text-align:center;color:var(--muted)}
+.rank li.p1 .pos{color:var(--bulb)} .rank li.p2 .pos{color:#d8dee9} .rank li.p3 .pos{color:#e0a370}
+.rank .nm{font-weight:700;min-width:0;overflow-wrap:anywhere}
+.rank .sc{font-family:var(--f-num);font-weight:700;font-variant-numeric:tabular-nums;color:var(--bulb)}
+.chain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.chain li{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-weight:700}
+.chain .arrow{color:var(--red);font-family:var(--f-num)}
+
+.admin{border-style:dashed;border-color:var(--ice)}
+.admin h2{color:var(--ice)}
 .confirm{display:flex;gap:8px}
 .confirm button{flex:1}
 .actions{display:flex;flex-direction:column;gap:10px}
-@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+footer{text-align:center;font-size:13px;color:var(--muted);padding-top:8px}
+
+@media (prefers-reduced-motion:reduce){.lights span{animation:none}.bar i{transition:none}button{transition:none}}
 </style>
 </head>
 <body>
+<div class="lights" aria-hidden="true"><span style="--d:0s"></span><span style="--d:.4s"></span><span style="--d:1.1s"></span><span style="--d:.7s"></span><span style="--d:1.6s"></span><span style="--d:.2s"></span><span style="--d:1.3s"></span><span style="--d:.9s"></span><span style="--d:1.9s"></span><span style="--d:.5s"></span><span style="--d:1.4s"></span><span style="--d:.1s"></span></div>
+
 <div class="wrap">
   <header>
     <span class="eyebrow">Arbre de Noël</span>
-    <h1>Tombola des cadeaux</h1>
-    <p class="muted">Inscris-toi avec 5 indices sur le cadeau qui te ferait plaisir, puis tire au sort la personne à qui tu offriras le tien.</p>
+    <h1>Tombola<small>Duisburg</small></h1>
+    <p class="lede">Chacun offre un cadeau à une personne tirée au sort, guidé par ses 5 indices. À la fin, à toi de deviner qui a offert à qui.</p>
   </header>
 
-  <ol class="steps">
-    <li id="st1">1. Inscription</li>
-    <li id="st2">2. Tirage</li>
-    <li id="st3">3. Indices</li>
-  </ol>
+  <section class="card hero" id="main"><h2>Chargement…</h2><p class="muted">Ouverture de la baraque.</p></section>
 
-  <section class="tag" id="main"><h2>Chargement…</h2><p class="muted">Récupération des inscriptions.</p></section>
+  <section class="rules" aria-labelledby="rulesTitle">
+    <h3 id="rulesTitle">Le déroulé</h3>
+    <ol class="timeline" id="timeline"></ol>
+  </section>
 
-  <section class="tag" id="namesBox" hidden>
+  <section class="card" id="namesBox" hidden>
     <div class="row"><h2>Déjà inscrits</h2><span class="count" id="namesCount">0</span></div>
     <div class="chips" id="names"></div>
   </section>
 
-  <section class="tag" id="progressBox" hidden>
-    <h2>Tirages effectués</h2>
+  <section class="card" id="progressBox" hidden>
+    <h2 id="progTitle"></h2>
     <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar"><i id="barFill"></i></div>
-    <div class="row"><span id="progLabel"></span><span id="progPct"></span></div>
+    <div class="row"><span id="progLabel"></span><span id="progPct" class="count" style="font-size:16px"></span></div>
     <p class="small muted" id="progNote"></p>
   </section>
 
-  <section class="tag" id="wallBox" hidden>
+  <section class="card" id="wallBox" hidden>
     <h2>Tous les indices</h2>
-    <p class="small muted">Juste les mots clés, sans les noms. À toi de deviner.</p>
-    <div class="wall" id="wall"></div>
+    <p class="small muted">Un lot de 5 mots clés par participant, sans les noms. Note les lettres : elles serviront pour les pronostics.</p>
+    <div class="sets" id="wall"></div>
   </section>
 
-  <section class="tag admin" id="adminBox" hidden></section>
+  <section class="card" id="resultsBox" hidden></section>
+
+  <section class="card admin" id="adminBox" hidden></section>
+
+  <footer>Tombola Duisburg · Arbre de Noël</footer>
 </div>
 
 <script type="module">
 /* =================== À MODIFIER =================== */
 // Colle ici la configuration de ton projet Firebase.
 const firebaseConfig = {
-
-  apiKey: "AIzaSyCTn_EzHJYKKA7KrifFtnLI1470k6f1wOQ",
-
-  authDomain: "darell-3b402.firebaseapp.com",
-
-  projectId: "darell-3b402",
-
-  storageBucket: "darell-3b402.firebasestorage.app",
-
-  messagingSenderId: "680704196983",
-
-  appId: "1:680704196983:web:d1757c4ecd3548d52b6172"
-
+  apiKey: "A_REMPLIR",
+  authDomain: "A_REMPLIR",
+  projectId: "A_REMPLIR",
+  storageBucket: "A_REMPLIR",
+  messagingSenderId: "A_REMPLIR",
+  appId: "A_REMPLIR",
 };
-
 /* ================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -140,10 +219,36 @@ import { getFirestore, collection, doc, onSnapshot, getDoc, getDocs, setDoc, del
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+const PHASES = [
+  { id:"inscription", t:"Inscription", d:"Ton prénom et 5 mots clés sur le cadeau qui te ferait plaisir. Tu reçois un numéro à garder précieusement." },
+  { id:"tirage",      t:"Tirage",      d:"Avec ton numéro, tu tires une personne et découvres ses 5 indices. Tu lui prépares un cadeau emballé, marqué de son numéro." },
+  { id:"indices",     t:"Indices",     d:"Tous les lots de mots clés sont publiés, sans les noms." },
+  { id:"pronostics",  t:"Pronostics",  d:"Reconstitue le jeu : à qui appartient chaque lot d'indices, et qui a offert un cadeau à qui ?" },
+  { id:"resultats",   t:"Résultats",   d:"La vraie chaîne des cadeaux est dévoilée, avec le classement des meilleurs pronostics." },
+];
+const PIDX = id => PHASES.findIndex(p=>p.id===id);
+
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const store = { get(k){ try{return localStorage.getItem(k);}catch(e){return null;} }, set(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
+const store = {
+  get(k){ try{return localStorage.getItem(k);}catch(e){return null;} },
+  set(k,v){ try{localStorage.setItem(k,v);}catch(e){} },
+  del(k){ try{localStorage.removeItem(k);}catch(e){} },
+};
 const chips = kws => `<div class="chips">${(kws||[]).map(k=>`<span class="chip">${esc(k)}</span>`).join("")}</div>`;
+
+// timeline (affichée même sans connexion)
+function renderTimeline(){
+  const cur = PIDX(S.phase);
+  $("timeline").innerHTML = PHASES.map((p,i)=>`<li class="${i<cur?"done":i===cur?"on":""}">
+    <span class="n">${i<cur?"✓":i+1}</span>
+    <div class="body"><b>${esc(p.t)}${i===cur?`<span class="tagnow">En cours</span>`:""}</b><p class="d">${esc(p.d)}</p></div></li>`).join("");
+}
+
+const S = { phase:"inscription", parts:{}, order:null, draws:0, pfaits:0, pronos:null, loaded:false,
+  result:null, err:"", busy:false, view:"", pnum:null,
+  admin:false, adminWanted: location.hash === "#admin", confirm:null, adminMsg:"" };
+renderTimeline();
 
 if(firebaseConfig.apiKey === "A_REMPLIR"){
   $("main").innerHTML = `<h2>Configuration manquante</h2><p class="muted">Colle la configuration Firebase en haut du fichier index.html (voir README).</p>`;
@@ -153,54 +258,68 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// phase : "inscription" -> "tirage" -> "indices"
-const S = { phase:"inscription", parts:{}, draws:0, order:null, loaded:false, result:null, err:"", busy:false, view:"",
-  admin:false, adminWanted: location.hash === "#admin", confirm:null, adminMsg:"" };
-
 const partList = () => Object.values(S.parts).sort((a,b)=>(a.at?.seconds||0)-(b.at?.seconds||0));
+const byName = () => Object.values(S.parts).sort((a,b)=>a.name.localeCompare(b.name,"fr"));
 const myNum = () => store.get("tombola-num");
-function prog(){ const total=partList().length, done=Math.min(S.draws,total); return {total,done,full:total>1&&done>=total}; }
+const letter = i => { let s=""; i++; while(i>0){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; };
+function wallSets(){
+  const h=s=>{let x=7;for(const c of String(s))x=(x*31+c.charCodeAt(0))%100003;return x;};
+  return Object.values(S.parts).sort((a,b)=>h(a.num+"x")-h(b.num+"x")).map((p,i)=>({...p, L:letter(i)}));
+}
+function giverOf(recv){ const o=S.order||[]; const i=o.indexOf(recv); return i<0 ? null : o[(i-1+o.length)%o.length]; }
+function displayName(p){
+  const same = Object.values(S.parts).filter(q=>q.name.toLowerCase()===p.name.toLowerCase());
+  return same.length>1 ? `${p.name} (${same.indexOf(p)+1})` : p.name;
+}
 
-// --------- rendu ---------
+// ---------------- rendu ----------------
 function render(){
-  const order = ["inscription","tirage","indices"], i = order.indexOf(S.phase);
-  ["st1","st2","st3"].forEach((id,k)=>$(id).className = k<i ? "done" : k===i ? "on" : "");
-  renderMain(); renderNames(); renderProgress(); renderWall(); renderAdmin();
+  renderTimeline(); renderMain(); renderNames(); renderProgress(); renderWall(); renderResults(); renderAdmin();
 }
 function setView(v, html){ S.view=v; $("main").innerHTML=html; }
 
 function ticketHTML(p){
-  return `<h2>Bonjour ${esc(p.name)}</h2>
-    <div class="ticket"><div><small>Ton numéro</small><div class="num">${esc(p.num)}</div></div>
-    <button type="button" class="ghost small" data-copy="${esc(p.num)}">Copier</button></div>
+  return `<h2>Bonjour ${esc(p.name)} !</h2>
+    <div class="ticket"><div class="stub">LOS</div><div class="main">
+      <div><small>Ton numéro</small><div class="num">${esc(p.num)}</div></div>
+      <button type="button" class="small" data-copy="${esc(p.num)}">Copier</button></div></div>
     ${chips(p.keywords)}`;
 }
 
 function renderMain(){
   if(!S.loaded) return;
+  const ph = S.phase;
+  if(ph==="inscription") return mainInscription();
+  if(ph==="tirage" || ph==="indices") return mainDraw();
+  if(ph==="pronostics") return mainPronostics();
+  if(ph==="resultats") return setView("res", `<h2>Les résultats sont tombés</h2><p class="muted">Découvre plus bas qui a offert à qui, à qui appartenaient les indices et le classement des pronostics.</p>`);
+}
+
+function mainInscription(){
   const mine = S.parts[myNum()];
-  if(S.phase==="inscription"){
-    if(mine) return setView("ticket", ticketHTML(mine) + `<p class="small muted">Inscription enregistrée. Note bien ce numéro : il te servira pour le tirage.</p>`);
-    if(S.view==="form") return;
-    setView("form", `<h2>Je participe</h2>
-      <form id="regForm" novalidate>
-        <label for="regName">Prénom<input id="regName" autocomplete="given-name" maxlength="30" placeholder="Ex. Camille"></label>
-        <fieldset><legend>5 mots clés sur le cadeau que tu souhaites</legend>
-          <div class="kw-grid">${[1,2,3,4,5].map(i=>`<div class="kw-row"><span>${i}</span><input id="kw${i}" maxlength="40" aria-label="Mot clé ${i}" placeholder="${["livre","chocolat","cosy","musique","bleu"][i-1]}"></div>`).join("")}</div>
-        </fieldset>
-        <p class="msg" id="regMsg" hidden></p>
-        <button type="submit" id="regBtn">Je participe</button>
-      </form>`);
-    $("regForm").addEventListener("submit", onRegister);
-    return;
-  }
-  // tirage ou indices
+  if(mine) return setView("ticket", ticketHTML(mine) + `<p class="small muted">Inscription enregistrée. Garde ce numéro : il te servira pour le tirage et les pronostics.</p>
+    <button type="button" class="ghost" data-other>Inscrire une autre personne sur ce téléphone</button>`);
+  if(S.view==="form") return;
+  setView("form", `<h2>Je participe</h2>
+    <form id="regForm" novalidate>
+      <label for="regName">Prénom<input id="regName" autocomplete="given-name" maxlength="30" placeholder="Ex. Camille"></label>
+      <fieldset><legend>5 mots clés sur le cadeau que tu souhaites</legend>
+        ${[1,2,3,4,5].map(i=>`<div class="kw-row"><span>${i}</span><input id="kw${i}" maxlength="40" aria-label="Mot clé ${i}" placeholder="${["livre","chocolat","cosy","musique","bleu"][i-1]}"></div>`).join("")}
+      </fieldset>
+      <p class="msg" id="regMsg" hidden></p>
+      <button type="submit" class="red" id="regBtn">Je participe</button>
+    </form>`);
+  $("regForm").addEventListener("submit", onRegister);
+}
+
+function mainDraw(){
   if(S.result){
     const r=S.result;
     return setView("result", `<h2>Tu offres un cadeau à</h2>
       <div class="drawn"><div class="who">${esc(r.name)}</div>${chips(r.keywords)}
       <div class="gnum">Écris le n° ${esc(r.num)} sur l'emballage</div></div>
-      <p class="small muted">Garde le secret. Tu peux revenir avec ton numéro pour revoir ce tirage.</p>`);
+      <p class="small muted">Garde le secret : les autres devront deviner que c'est toi.</p>
+      <button type="button" class="ghost" data-other>Tirer pour une autre personne</button>`);
   }
   if(S.view!=="draw"){
     setView("draw", `<h2>À toi de tirer</h2>
@@ -208,12 +327,67 @@ function renderMain(){
       <form id="drawForm" novalidate>
         <label for="drawNum">Mon numéro<input id="drawNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"></label>
         <p class="msg" id="drawMsg" hidden></p>
-        <button type="submit" id="drawBtn">Tirer au sort</button>
+        <button type="submit" class="red" id="drawBtn">Tirer au sort</button>
       </form>`);
     $("drawForm").addEventListener("submit", onDraw);
   }
   $("drawMsg").hidden = !S.err; $("drawMsg").textContent = S.err; $("drawBtn").disabled = S.busy;
   $("drawBtn").textContent = S.busy ? "Tirage…" : "Tirer au sort";
+}
+
+function mainPronostics(){
+  const num = S.pnum;
+  if(S.view==="pronoForm" || S.view==="pronoSent") { if(S.view==="pronoSent") pronoSent(); return; }
+  if(!num || !S.parts[num]){
+    setView("pronoLogin", `<h2>À toi de jouer</h2>
+      <p class="muted">Reconstitue la tombola : à qui appartient chaque lot d'indices, et qui a offert à qui. Un point par bonne réponse.</p>
+      <form id="pLogin" novalidate>
+        <label for="pNum">Mon numéro<input id="pNum" inputmode="numeric" maxlength="3" placeholder="Ex. 427" value="${esc(myNum()||"")}"></label>
+        <p class="msg" id="pMsg" hidden></p>
+        <button type="submit" class="red">Commencer mes pronostics</button>
+      </form>`);
+    $("pLogin").addEventListener("submit", ev=>{
+      ev.preventDefault();
+      const v=$("pNum").value.trim();
+      if(!S.parts[v]){ const m=$("pMsg"); m.hidden=false; m.textContent="Ce numéro n'existe pas. Vérifie-le."; return; }
+      S.pnum=v; store.set("tombola-num", v); S.view="";
+      store.get("tombola-prono-sent-"+v) ? pronoSent() : pronoForm();
+      render(); window.scrollTo(0,0);
+    });
+    return;
+  }
+  store.get("tombola-prono-sent-"+num) ? pronoSent() : pronoForm();
+}
+
+function pronoForm(){
+  const num=S.pnum, me=S.parts[num];
+  let draft={}; try{ draft=JSON.parse(store.get("tombola-prono-"+num)||"{}"); }catch(e){}
+  const opts = (sel, exclude) => `<option value="">Choisir…</option>` + byName().filter(p=>p.num!==exclude)
+    .map(p=>`<option value="${esc(p.num)}"${sel===p.num?" selected":""}>${esc(displayName(p))}</option>`).join("");
+  const sets = wallSets();
+  setView("pronoForm", `<h2>Pronostics de ${esc(me.name)}</h2>
+    <p class="small muted">Tu peux laisser des cases vides. Tu pourras modifier tes réponses tant que les résultats ne sont pas publiés.</p>
+    <form id="pForm" novalidate>
+      <fieldset><legend>1. À qui appartient chaque lot d'indices ?</legend>
+        ${sets.map(s=>`<div class="set"><span class="l">${s.L}</span><div class="c">${chips(s.keywords)}
+          <select id="kw-${s.num}" aria-label="Propriétaire du lot ${s.L}">${opts((draft.kw||{})[s.num])}</select></div></div>`).join("")}
+      </fieldset>
+      <fieldset><legend>2. Qui a offert un cadeau à qui ?</legend>
+        ${byName().map(p=>`<div class="gift"><span>Cadeau reçu par <b>${esc(displayName(p))}</b>, offert par :</span>
+          <select id="gf-${p.num}" aria-label="Qui a offert à ${esc(p.name)}">${opts((draft.gift||{})[p.num], p.num)}</select></div>`).join("")}
+      </fieldset>
+      <p class="msg" id="pfMsg" hidden></p>
+      <button type="submit" class="red" id="pfBtn">Envoyer mes pronostics</button>
+    </form>`);
+  $("pForm").addEventListener("submit", onPronostics);
+}
+
+function pronoSent(){
+  const me=S.parts[S.pnum];
+  setView("pronoSent", `<h2>Pronostics envoyés</h2>
+    <p class="msg ok">Merci ${esc(me?.name||"")} ! Rendez-vous à la publication des résultats pour voir ton score.</p>
+    <button type="button" class="ghost" data-edit-prono>Modifier mes réponses</button>
+    <button type="button" class="ghost" data-other>Pronostics pour une autre personne</button>`);
 }
 
 function renderNames(){
@@ -227,23 +401,67 @@ function renderNames(){
 }
 
 function renderProgress(){
-  const on = S.phase!=="inscription"; $("progressBox").hidden = !on; if(!on) return;
-  const {total,done,full}=prog(), pct = total ? Math.round(done/total*100) : 0;
+  const ph=S.phase, total=partList().length;
+  const on = ph==="tirage" || ph==="indices" || ph==="pronostics";
+  $("progressBox").hidden = !on; if(!on) return;
+  const isP = ph==="pronostics";
+  const done = Math.min(isP ? S.pfaits : S.draws, total), pct = total ? Math.round(done/total*100) : 0;
+  $("progTitle").textContent = isP ? "Pronostics envoyés" : "Tirages effectués";
   $("barFill").style.width = pct+"%"; $("bar").setAttribute("aria-valuenow", pct);
   $("progLabel").textContent = `${done} sur ${total} participant${total>1?"s":""}`;
   $("progPct").textContent = pct+" %";
-  $("progNote").textContent = full ? "Tout le monde a tiré quelqu'un. Chacun recevra un seul cadeau." : "La barre se remplit à chaque tirage.";
+  $("progNote").textContent = isP
+    ? (done>=total && total ? "Tout le monde a joué. Place aux résultats !" : "La barre se remplit à chaque pronostic envoyé.")
+    : (done>=total && total>1 ? "Tout le monde a tiré quelqu'un. Chacun recevra un seul cadeau." : "La barre se remplit à chaque tirage.");
 }
 
 function renderWall(){
-  const ps = partList();
-  $("wallBox").hidden = S.phase!=="indices" || !ps.length; if($("wallBox").hidden) return;
-  const h=s=>{let x=7;for(const c of String(s))x=(x*31+c.charCodeAt(0))%100003;return x;};
-  ps.sort((a,b)=>h(a.num+"x")-h(b.num+"x"));
-  $("wall").innerHTML = ps.map(p=>chips(p.keywords)).join("");
+  const show = S.loaded && (S.phase==="indices" || (S.phase==="pronostics" && S.view!=="pronoForm"));
+  $("wallBox").hidden = !show || !partList().length; if($("wallBox").hidden) return;
+  $("wall").innerHTML = wallSets().map(s=>`<div class="set"><span class="l">${s.L}</span><div class="c">${chips(s.keywords)}</div></div>`).join("");
 }
 
-// --------- espace organisateur (ouvrir le site avec #admin) ---------
+function scoreOf(pr){
+  let k=0, g=0;
+  for(const [setNum,guess] of Object.entries(pr.kw||{})) if(guess && guess===setNum) k++;
+  for(const [recv,guess] of Object.entries(pr.gift||{})) if(guess && guess===giverOf(recv)) g++;
+  return { k, g, t:k+g };
+}
+function renderResults(){
+  const box=$("resultsBox");
+  if(S.phase!=="resultats" || !S.loaded){ box.hidden=true; return; }
+  box.hidden=false;
+  const n=partList().length, max=n*2, me=myNum();
+  const rows=(S.pronos||[]).filter(p=>S.parts[p.num]).map(p=>({num:p.num, name:displayName(S.parts[p.num]), ...scoreOf(p)})).sort((a,b)=>b.t-a.t || a.name.localeCompare(b.name,"fr"));
+  let rank=0, prev=null;
+  rows.forEach((r,i)=>{ if(r.t!==prev){ rank=i+1; prev=r.t; } r.rank=rank; });
+  const o=S.order||[];
+  box.innerHTML = `
+    <h2>Classement des pronostics</h2>
+    <p class="small muted">Un point par lot d'indices bien attribué et par donneur bien trouvé, sur ${max} points.</p>
+    ${S.pronos===null ? `<p class="muted">Chargement du classement…</p>` : rows.length ? `<ol class="rank">${rows.map(r=>`<li class="p${r.rank}${r.num===me?" me":""}">
+        <span class="pos">${r.rank}</span><span class="nm">${esc(r.name)}<br><span class="small muted">${r.k} indice${r.k>1?"s":""} · ${r.g} cadeau${r.g>1?"x":""}</span></span>
+        <span class="sc">${r.t}/${max}</span></li>`).join("")}</ol>` : `<p class="muted">Personne n'a envoyé de pronostics.</p>`}
+    <h2>La chaîne des cadeaux</h2>
+    <ul class="chain">${o.filter(x=>S.parts[x]).map((g,i)=>{ const r=o[(i+1)%o.length]; return S.parts[r] ? `<li><span>${esc(displayName(S.parts[g]))}</span><span class="arrow">→</span><span>${esc(displayName(S.parts[r]))}</span></li>` : ""; }).join("")}</ul>
+    <h2>À qui étaient les indices</h2>
+    <div class="sets">${wallSets().map(s=>`<div class="set"><span class="l">${s.L}</span><div class="c"><b>${esc(displayName(s))}</b>${chips(s.keywords)}</div></div>`).join("")}</div>`;
+}
+
+// ---------------- organisateur (adresse + #admin) ----------------
+const NEXT = {
+  inscription:{ to:"tirage", label:"Fermer les inscriptions et lancer le tirage", warn:n=>`Le tirage sera fait entre les ${n} inscrits. Plus personne ne pourra s'inscrire.` },
+  tirage:     { to:"indices", label:"Publier les indices", warn:()=>"Tous les lots de mots clés deviennent visibles, sans les noms. Le tirage reste ouvert." },
+  indices:    { to:"pronostics", label:"Ouvrir les pronostics", warn:(n,d)=>`Le tirage se ferme${d<n?` alors que ${n-d} personne${n-d>1?"s n'ont":" n'a"} pas encore tiré`:""}. Chacun peut envoyer ses pronostics.` },
+  pronostics: { to:"resultats", label:"Publier les résultats", warn:()=>"La chaîne des cadeaux, les propriétaires des indices et le classement deviennent visibles. Les pronostics se ferment." },
+};
+const BACK = {
+  tirage:     { to:"inscription", label:"Rouvrir les inscriptions", warn:()=>"Le tirage actuel sera effacé. Il faudra relancer le tirage et chacun devra tirer à nouveau." },
+  indices:    { to:"tirage", label:"Masquer les indices", warn:()=>"Les indices ne seront plus affichés." },
+  pronostics: { to:"indices", label:"Fermer les pronostics", warn:()=>"Les pronostics déjà envoyés sont gardés." },
+  resultats:  { to:"pronostics", label:"Masquer les résultats", warn:()=>"Les résultats ne seront plus visibles et les pronostics se rouvrent." },
+};
+
 function renderAdmin(){
   const box=$("adminBox");
   if(!S.adminWanted && !S.admin){ box.hidden=true; return; }
@@ -251,40 +469,36 @@ function renderAdmin(){
   if(!S.admin){
     if(box.dataset.v==="login") return;
     box.dataset.v="login";
-    box.innerHTML=`<h2>Organisateur</h2>
+    box.innerHTML=`<h2>Espace organisateur</h2>
       <form id="loginForm" novalidate>
         <label for="adEmail">E-mail<input id="adEmail" type="email" autocomplete="username"></label>
         <label for="adPass">Mot de passe<input id="adPass" type="password" autocomplete="current-password"></label>
         <p class="msg" id="loginMsg" hidden></p>
-        <button type="submit" class="green">Me connecter</button>
+        <button type="submit" class="fir">Me connecter</button>
       </form>`;
     $("loginForm").addEventListener("submit", onLogin);
     return;
   }
   box.dataset.v="panel";
-  const {total,done}=prog();
-  const next = { inscription:["tirage","Fermer les inscriptions et lancer le tirage"], tirage:["indices","Publier tous les indices"], indices:null }[S.phase];
-  const back = { inscription:null, tirage:["inscription","Rouvrir les inscriptions"], indices:["tirage","Masquer les indices"] }[S.phase];
-  const c = S.confirm;
-  const confirmText = c==="tirage" ? `Le tirage sera fait entre les ${total} inscrits. Plus personne ne pourra s'inscrire.`
-    : c==="indices" ? "Tous les mots clés seront visibles par tout le monde."
-    : c==="inscription" ? "Le tirage actuel sera effacé. Il faudra relancer le tirage et chacun devra tirer à nouveau."
-    : c==="tirage-back" ? "Les indices ne seront plus affichés." : "";
-  box.innerHTML=`<div class="row"><h2>Organisateur</h2><button type="button" class="ghost small" id="logout">Déconnexion</button></div>
-    <p class="small muted">${total} inscrit${total>1?"s":""}, ${done} tirage${done>1?"s":""} effectué${done>1?"s":""}. Tu peux retirer un inscrit avec la croix à côté de son prénom pendant les inscriptions.</p>
-    ${c ? `<p class="msg">${esc(confirmText)}</p>
-      <div class="confirm"><button type="button" class="green" id="cfYes">Confirmer</button><button type="button" class="ghost" id="cfNo">Annuler</button></div>`
+  const n=partList().length, d=Math.min(S.draws,n), pf=Math.min(S.pfaits,n);
+  const next=NEXT[S.phase], back=BACK[S.phase], c=S.confirm;
+  const action = c ? (c.dir==="next"?next:back) : null;
+  box.innerHTML=`<div class="row"><h2>Espace organisateur</h2><button type="button" class="ghost small" id="logout">Déconnexion</button></div>
+    <p class="small muted">Étape actuelle : <b>${esc(PHASES[PIDX(S.phase)].t)}</b>. ${n} inscrit${n>1?"s":""}, ${d} tirage${d>1?"s":""}, ${pf} pronostic${pf>1?"s":""}.
+    ${S.phase==="inscription"?" La croix à côté d'un prénom retire un doublon.":""}</p>
+    ${action ? `<p class="msg info">${esc(action.warn(n,d))}</p>
+      <div class="confirm"><button type="button" class="fir" id="cfYes">Confirmer</button><button type="button" class="ghost" id="cfNo">Annuler</button></div>`
       : `<div class="actions">
-          ${next?`<button type="button" class="green" id="goNext" ${S.phase==="inscription"&&total<2?"disabled":""}>${next[1]}</button>`:""}
-          ${S.phase==="inscription"&&total<2?`<p class="small muted">Il faut au moins 2 inscrits pour lancer le tirage.</p>`:""}
-          ${back?`<button type="button" class="ghost" id="goBack">${back[1]}</button>`:""}
+          ${next?`<button type="button" class="fir" id="goNext" ${S.phase==="inscription"&&n<2?"disabled":""}>${esc(next.label)}</button>`:""}
+          ${S.phase==="inscription"&&n<2?`<p class="small muted">Il faut au moins 2 inscrits pour lancer le tirage.</p>`:""}
+          ${back?`<button type="button" class="ghost" id="goBack">${esc(back.label)}</button>`:""}
         </div>`}
     ${S.adminMsg?`<p class="msg">${esc(S.adminMsg)}</p>`:""}`;
   $("logout").onclick = () => signOut(auth);
-  if(c){ $("cfYes").onclick = () => doPhase(c==="tirage-back"?"tirage":c); $("cfNo").onclick = () => { S.confirm=null; render(); }; }
+  if(action){ $("cfYes").onclick = () => doPhase(action.to); $("cfNo").onclick = () => { S.confirm=null; render(); }; }
   else {
-    if($("goNext")) $("goNext").onclick = () => { S.confirm=next[0]; S.adminMsg=""; render(); };
-    if($("goBack")) $("goBack").onclick = () => { S.confirm = back[0]==="tirage" ? "tirage-back" : back[0]; S.adminMsg=""; render(); };
+    if($("goNext")) $("goNext").onclick = () => { S.confirm={dir:"next"}; S.adminMsg=""; render(); };
+    if($("goBack")) $("goBack").onclick = () => { S.confirm={dir:"back"}; S.adminMsg=""; render(); };
   }
 }
 
@@ -305,18 +519,17 @@ async function doPhase(target){
     }
     batch.set(doc(db,"config","etat"), { phase:target });
     await batch.commit();
-  }catch(e){ console.error(e); S.adminMsg="Action refusée. Vérifie que tu es bien connecté avec l'e-mail inscrit dans les règles Firestore."; }
+  }catch(e){ console.error(e); S.adminMsg="Action refusée. Vérifie que tu es connecté avec l'e-mail inscrit dans les règles Firestore."; }
   render();
 }
 
 async function onLogin(ev){
   ev.preventDefault();
-  const m=$("loginMsg");
   try{ await signInWithEmailAndPassword(auth, $("adEmail").value.trim(), $("adPass").value); }
-  catch(e){ m.hidden=false; m.textContent="E-mail ou mot de passe incorrect."; }
+  catch(e){ const m=$("loginMsg"); m.hidden=false; m.textContent="E-mail ou mot de passe incorrect."; }
 }
 
-// --------- actions participants ---------
+// ---------------- actions participants ----------------
 async function onRegister(ev){
   ev.preventDefault();
   const msg=$("regMsg"), btn=$("regBtn");
@@ -367,9 +580,37 @@ async function onDraw(ev){
   S.busy=false; render();
 }
 
+async function onPronostics(ev){
+  ev.preventDefault();
+  const num=S.pnum, btn=$("pfBtn"), msg=$("pfMsg");
+  const kw={}, gift={};
+  for(const p of Object.values(S.parts)){
+    const a=$("kw-"+p.num)?.value; if(a) kw[p.num]=a;
+    const b=$("gf-"+p.num)?.value; if(b) gift[p.num]=b;
+  }
+  store.set("tombola-prono-"+num, JSON.stringify({kw,gift}));
+  btn.disabled=true; btn.textContent="Envoi…";
+  try{
+    const batch=writeBatch(db);
+    batch.set(doc(db,"pronostics",num), { num, kw, gift, at:serverTimestamp() });
+    batch.set(doc(db,"pronostics_faits",num), { at:serverTimestamp() });
+    await batch.commit();
+    store.set("tombola-prono-sent-"+num, "1");
+    S.view=""; pronoSent(); render(); window.scrollTo(0,0);
+  }catch(e){
+    console.error(e); btn.disabled=false; btn.textContent="Envoyer mes pronostics";
+    msg.hidden=false; msg.textContent="L'envoi n'a pas abouti. Les pronostics sont peut-être fermés, ou ta connexion a coupé.";
+  }
+}
+
 document.addEventListener("click", async ev=>{
   const c = ev.target.closest("[data-copy]");
   if(c){ try{ await navigator.clipboard.writeText(c.dataset.copy); c.textContent="Copié"; }catch(e){ c.textContent=c.dataset.copy; } return; }
+  if(ev.target.closest("[data-other]")){
+    store.del("tombola-num"); S.pnum=null;
+    S.result=null; S.err=""; S.view=""; render(); window.scrollTo(0,0); return;
+  }
+  if(ev.target.closest("[data-edit-prono]")){ S.view=""; pronoForm(); render(); return; }
   const d = ev.target.closest("[data-del]");
   if(d && S.admin){
     if(d.dataset.sure!=="1"){ d.dataset.sure="1"; d.textContent="Retirer ?"; d.style.fontSize="13px"; return; }
@@ -378,18 +619,29 @@ document.addEventListener("click", async ev=>{
 });
 window.addEventListener("hashchange", ()=>{ S.adminWanted = location.hash==="#admin"; render(); });
 
-// --------- données en direct ---------
+// ---------------- données en direct ----------------
+let unPronos=null;
+function watchPronos(){
+  const need = S.phase==="resultats" || S.admin;
+  if(need && !unPronos){
+    unPronos = onSnapshot(collection(db,"pronostics"), s=>{ S.pronos=s.docs.map(d=>d.data()); render(); },
+      e=>{ console.error(e); unPronos=null; });
+  } else if(!need && unPronos){ unPronos(); unPronos=null; S.pronos=null; }
+}
 const offline = setTimeout(()=>{ if(!S.loaded) $("main").innerHTML=`<h2>Connexion impossible</h2><p class="muted">Les données ne répondent pas. Vérifie ta connexion puis recharge la page.</p>`; }, 10000);
+S.pnum = myNum();
 onSnapshot(doc(db,"config","etat"), s => {
   const p = s.exists() ? s.data().phase : "inscription";
-  if(p!==S.phase){ S.phase=p; S.view=""; S.err=""; if(p==="inscription") S.result=null; }
-  render();
+  if(p!==S.phase){ S.phase=p; S.view=""; S.err=""; if(PIDX(p)<PIDX("tirage")) S.result=null; }
+  watchPronos(); render();
 }, e => console.error(e));
 onSnapshot(collection(db,"participants"), s => {
   const o={}; s.forEach(d=>o[d.id]=d.data()); S.parts=o; S.loaded=true; clearTimeout(offline); render();
 }, e => { console.error(e); $("main").innerHTML=`<h2>Accès refusé</h2><p class="muted">Vérifie les règles Firestore (voir README).</p>`; });
+onSnapshot(doc(db,"tirage","attribution"), s => { S.order = s.exists() ? s.data().order : null; render(); }, e=>console.error(e));
 onSnapshot(collection(db,"tirages"), s => { S.draws=s.size; render(); }, e=>console.error(e));
-onAuthStateChanged(auth, u => { S.admin = !!u; $("adminBox").dataset.v=""; render(); });
+onSnapshot(collection(db,"pronostics_faits"), s => { S.pfaits=s.size; render(); }, e=>console.error(e));
+onAuthStateChanged(auth, u => { S.admin = !!u; $("adminBox").dataset.v=""; watchPronos(); render(); });
 </script>
 </body>
 </html>
