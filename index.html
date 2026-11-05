@@ -32,9 +32,8 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.2;m
 p{margin:0}
 .muted{color:var(--muted)} .small{font-size:14px}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;list-style:none;margin:0;padding:0}
-.steps li{border-top:3px solid var(--line);padding-top:8px;font-size:13px;color:var(--muted);min-width:0}
-.steps li b{display:block;color:var(--ink);font-weight:600;font-size:14px}
-.steps li.on{border-color:var(--ribbon)} .steps li.done{border-color:var(--pine)}
+.steps li{border-top:3px solid var(--line);padding-top:8px;font-size:14px;font-weight:600;color:var(--muted);min-width:0}
+.steps li.on{border-color:var(--ribbon);color:var(--ink)} .steps li.done{border-color:var(--pine)}
 .tag{position:relative;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 20px;display:flex;flex-direction:column;gap:16px}
 .tag::before{content:"";position:absolute;top:14px;right:16px;width:12px;height:12px;border-radius:50%;border:2px solid var(--line);background:var(--bg)}
 form{display:flex;flex-direction:column;gap:14px}
@@ -47,24 +46,33 @@ legend{font-weight:600;font-size:14px;padding:0;margin-bottom:8px}
 .kw-row{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px}
 .kw-row span{font-family:var(--f-mono);font-size:13px;color:var(--muted);text-align:center}
 button{font:inherit;font-weight:700;font-size:16px;border:0;border-radius:999px;padding:14px 20px;cursor:pointer;background:var(--ribbon);color:var(--paper);width:100%}
-button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600;width:auto;padding:10px 16px}
+button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:600}
+button.small{width:auto;padding:10px 16px;font-size:15px}
+button.green{background:var(--pine)}
 button:disabled{opacity:.55;cursor:default}
 button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .msg{font-size:14px;padding:10px 12px;border-radius:10px;background:var(--ribbon-soft)}
+.msg.ok{background:var(--pine-soft)}
 .ticket{display:flex;align-items:center;justify-content:space-between;gap:12px;border:2px dashed var(--pine);border-radius:12px;padding:14px 16px;background:var(--pine-soft)}
 .ticket .num{font-family:var(--f-mono);font-weight:700;font-size:40px;letter-spacing:.06em;color:var(--pine);line-height:1}
 .ticket small{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
-.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:500}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.chip.me{border-color:var(--pine);color:var(--pine);font-weight:700}
+.chip .x{border:0;background:none;color:var(--ribbon);padding:0 2px;width:auto;font-size:16px;line-height:1}
 .drawn{border:2px solid var(--ribbon);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px}
 .drawn .who{font-family:var(--f-display);font-size:30px;line-height:1.1}
 .drawn .gnum{font-family:var(--f-mono);font-weight:700;font-size:15px;color:var(--ribbon)}
 .bar{height:14px;border-radius:999px;background:var(--line);overflow:hidden}
 .bar i{display:block;height:100%;width:0;background:var(--pine);border-radius:999px;transition:width .6s ease}
-.row{display:flex;justify-content:space-between;font-size:14px;font-variant-numeric:tabular-nums;gap:8px}
+.row{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;font-variant-numeric:tabular-nums;gap:8px}
 .count{font-family:var(--f-mono);font-size:22px;font-weight:700;color:var(--pine)}
 .wall{display:grid;gap:10px}
 .wall .chips{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.admin{border-style:dashed}
+.confirm{display:flex;gap:8px}
+.confirm button{flex:1}
+.actions{display:flex;flex-direction:column;gap:10px}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
@@ -77,12 +85,17 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
   </header>
 
   <ol class="steps">
-    <li id="st1"><b>1. Inscription</b><span id="st1d"></span></li>
-    <li id="st2"><b>2. Tirage</b><span id="st2d"></span></li>
-    <li id="st3"><b>3. Indices</b><span id="st3d"></span></li>
+    <li id="st1">1. Inscription</li>
+    <li id="st2">2. Tirage</li>
+    <li id="st3">3. Indices</li>
   </ol>
 
   <section class="tag" id="main"><h2>Chargement…</h2><p class="muted">Récupération des inscriptions.</p></section>
+
+  <section class="tag" id="namesBox" hidden>
+    <div class="row"><h2>Déjà inscrits</h2><span class="count" id="namesCount">0</span></div>
+    <div class="chips" id="names"></div>
+  </section>
 
   <section class="tag" id="progressBox" hidden>
     <h2>Tirages effectués</h2>
@@ -96,17 +109,13 @@ button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
     <p class="small muted">Juste les mots clés, sans les noms. À toi de deviner.</p>
     <div class="wall" id="wall"></div>
   </section>
+
+  <section class="tag admin" id="adminBox" hidden></section>
 </div>
 
 <script type="module">
 /* =================== À MODIFIER =================== */
-// 1) Les dates (heure de Paris). Les inscriptions durent 24 h à partir de INSCRIPTIONS.
-const DATES = {
-  INSCRIPTIONS: "2026-12-01T18:00:00+01:00",
-  TIRAGE:       "2026-12-03T18:00:00+01:00",
-  INDICES:      "2026-12-20T18:00:00+01:00",
-};
-// 2) La configuration de ton projet Firebase (voir README).
+// Colle ici la configuration de ton projet Firebase.
 const firebaseConfig = {
 
   apiKey: "AIzaSyCTn_EzHJYKKA7KrifFtnLI1470k6f1wOQ",
@@ -122,64 +131,58 @@ const firebaseConfig = {
   appId: "1:680704196983:web:d1757c4ecd3548d52b6172"
 
 };
+
 /* ================================================== */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, doc, onSnapshot, getDoc, getDocs, setDoc, runTransaction, serverTimestamp }
+import { getFirestore, collection, doc, onSnapshot, getDoc, getDocs, setDoc, deleteDoc, runTransaction, writeBatch, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-const H = 3600e3;
-const T = { p1:new Date(DATES.INSCRIPTIONS).getTime(), p2:new Date(DATES.TIRAGE).getTime(), p3:new Date(DATES.INDICES).getTime() };
-T.p1e = T.p1 + 24*H;
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const fmt = t => new Date(t).toLocaleString("fr-FR",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"});
-const fmtShort = t => new Date(t).toLocaleDateString("fr-FR",{day:"numeric",month:"short"}) + " " + new Date(t).toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"});
 const store = { get(k){ try{return localStorage.getItem(k);}catch(e){return null;} }, set(k,v){ try{localStorage.setItem(k,v);}catch(e){} } };
 const chips = kws => `<div class="chips">${(kws||[]).map(k=>`<span class="chip">${esc(k)}</span>`).join("")}</div>`;
-
-function phase(){ const n=Date.now();
-  if(n<T.p1) return "before"; if(n<T.p1e) return "register"; if(n<T.p2) return "wait"; return "draw"; }
-
-const S = { parts:{}, draws:0, loaded:false, result:null, err:"", busy:false, view:"" };
 
 if(firebaseConfig.apiKey === "A_REMPLIR"){
   $("main").innerHTML = `<h2>Configuration manquante</h2><p class="muted">Colle la configuration Firebase en haut du fichier index.html (voir README).</p>`;
   throw new Error("firebaseConfig manquant");
 }
-const db = getFirestore(initializeApp(firebaseConfig));
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-// --------- rendu ---------
-function render(){
-  const ph = phase(), n = Date.now();
-  $("st1d").textContent = fmtShort(T.p1); $("st2d").textContent = fmtShort(T.p2); $("st3d").textContent = fmtShort(T.p3);
-  $("st1").className = ph==="register" ? "on" : n>=T.p1e ? "done" : "";
-  $("st2").className = ph==="draw" ? (prog().full ? "done" : "on") : "";
-  $("st3").className = n>=T.p3 ? "done" : "";
-  renderMain(ph); renderProgress(ph); renderWall();
-}
-const partList = () => Object.values(S.parts);
+// phase : "inscription" -> "tirage" -> "indices"
+const S = { phase:"inscription", parts:{}, draws:0, order:null, loaded:false, result:null, err:"", busy:false, view:"",
+  admin:false, adminWanted: location.hash === "#admin", confirm:null, adminMsg:"" };
+
+const partList = () => Object.values(S.parts).sort((a,b)=>(a.at?.seconds||0)-(b.at?.seconds||0));
 const myNum = () => store.get("tombola-num");
 function prog(){ const total=partList().length, done=Math.min(S.draws,total); return {total,done,full:total>1&&done>=total}; }
 
+// --------- rendu ---------
+function render(){
+  const order = ["inscription","tirage","indices"], i = order.indexOf(S.phase);
+  ["st1","st2","st3"].forEach((id,k)=>$(id).className = k<i ? "done" : k===i ? "on" : "");
+  renderMain(); renderNames(); renderProgress(); renderWall(); renderAdmin();
+}
 function setView(v, html){ S.view=v; $("main").innerHTML=html; }
 
 function ticketHTML(p){
   return `<h2>Bonjour ${esc(p.name)}</h2>
     <div class="ticket"><div><small>Ton numéro</small><div class="num">${esc(p.num)}</div></div>
-    <button type="button" class="ghost" data-copy="${esc(p.num)}">Copier</button></div>
+    <button type="button" class="ghost small" data-copy="${esc(p.num)}">Copier</button></div>
     ${chips(p.keywords)}`;
 }
 
-function renderMain(ph){
+function renderMain(){
   if(!S.loaded) return;
   const mine = S.parts[myNum()];
-  if(ph==="before") return setView("before", `<h2>Les inscriptions ouvrent ${esc(fmt(T.p1))}</h2><p class="muted">Tu auras 24 heures pour t'inscrire avec ton prénom et 5 indices.</p>`);
-  if(ph==="register"){
-    if(mine) return setView("ticket", ticketHTML(mine) + `<p class="small muted">Inscription enregistrée. Note bien ce numéro : il te servira pour le tirage ${esc(fmt(T.p2))}.</p>`);
+  if(S.phase==="inscription"){
+    if(mine) return setView("ticket", ticketHTML(mine) + `<p class="small muted">Inscription enregistrée. Note bien ce numéro : il te servira pour le tirage.</p>`);
     if(S.view==="form") return;
     setView("form", `<h2>Je participe</h2>
-      <p class="small muted">Fermeture des inscriptions ${esc(fmt(T.p1e))}.</p>
       <form id="regForm" novalidate>
         <label for="regName">Prénom<input id="regName" autocomplete="given-name" maxlength="30" placeholder="Ex. Camille"></label>
         <fieldset><legend>5 mots clés sur le cadeau que tu souhaites</legend>
@@ -191,12 +194,7 @@ function renderMain(ph){
     $("regForm").addEventListener("submit", onRegister);
     return;
   }
-  if(ph==="wait"){
-    const n = partList().length;
-    return setView("wait", (mine ? ticketHTML(mine) : `<h2>Inscriptions closes</h2>`) +
-      `<p class="muted"><span class="count">${n}</span> participant${n>1?"s":""}. Le tirage commence ${esc(fmt(T.p2))}.</p>`);
-  }
-  // tirage
+  // tirage ou indices
   if(S.result){
     const r=S.result;
     return setView("result", `<h2>Tu offres un cadeau à</h2>
@@ -218,8 +216,18 @@ function renderMain(ph){
   $("drawBtn").textContent = S.busy ? "Tirage…" : "Tirer au sort";
 }
 
-function renderProgress(ph){
-  $("progressBox").hidden = ph!=="draw"; if(ph!=="draw") return;
+function renderNames(){
+  const ps = partList();
+  $("namesBox").hidden = S.phase!=="inscription" || !S.loaded;
+  $("namesCount").textContent = ps.length;
+  const mine = myNum();
+  $("names").innerHTML = ps.length
+    ? ps.map(p=>`<span class="chip${p.num===mine?" me":""}">${esc(p.name)}${S.admin?`<button type="button" class="x" data-del="${esc(p.num)}" aria-label="Retirer ${esc(p.name)}">×</button>`:""}</span>`).join("")
+    : `<p class="small muted">Personne pour l'instant. Sois le premier !</p>`;
+}
+
+function renderProgress(){
+  const on = S.phase!=="inscription"; $("progressBox").hidden = !on; if(!on) return;
   const {total,done,full}=prog(), pct = total ? Math.round(done/total*100) : 0;
   $("barFill").style.width = pct+"%"; $("bar").setAttribute("aria-valuenow", pct);
   $("progLabel").textContent = `${done} sur ${total} participant${total>1?"s":""}`;
@@ -229,20 +237,93 @@ function renderProgress(ph){
 
 function renderWall(){
   const ps = partList();
-  $("wallBox").hidden = Date.now()<T.p3 || !ps.length; if($("wallBox").hidden) return;
+  $("wallBox").hidden = S.phase!=="indices" || !ps.length; if($("wallBox").hidden) return;
   const h=s=>{let x=7;for(const c of String(s))x=(x*31+c.charCodeAt(0))%100003;return x;};
   ps.sort((a,b)=>h(a.num+"x")-h(b.num+"x"));
   $("wall").innerHTML = ps.map(p=>chips(p.keywords)).join("");
 }
 
-// --------- actions ---------
+// --------- espace organisateur (ouvrir le site avec #admin) ---------
+function renderAdmin(){
+  const box=$("adminBox");
+  if(!S.adminWanted && !S.admin){ box.hidden=true; return; }
+  box.hidden=false;
+  if(!S.admin){
+    if(box.dataset.v==="login") return;
+    box.dataset.v="login";
+    box.innerHTML=`<h2>Organisateur</h2>
+      <form id="loginForm" novalidate>
+        <label for="adEmail">E-mail<input id="adEmail" type="email" autocomplete="username"></label>
+        <label for="adPass">Mot de passe<input id="adPass" type="password" autocomplete="current-password"></label>
+        <p class="msg" id="loginMsg" hidden></p>
+        <button type="submit" class="green">Me connecter</button>
+      </form>`;
+    $("loginForm").addEventListener("submit", onLogin);
+    return;
+  }
+  box.dataset.v="panel";
+  const {total,done}=prog();
+  const next = { inscription:["tirage","Fermer les inscriptions et lancer le tirage"], tirage:["indices","Publier tous les indices"], indices:null }[S.phase];
+  const back = { inscription:null, tirage:["inscription","Rouvrir les inscriptions"], indices:["tirage","Masquer les indices"] }[S.phase];
+  const c = S.confirm;
+  const confirmText = c==="tirage" ? `Le tirage sera fait entre les ${total} inscrits. Plus personne ne pourra s'inscrire.`
+    : c==="indices" ? "Tous les mots clés seront visibles par tout le monde."
+    : c==="inscription" ? "Le tirage actuel sera effacé. Il faudra relancer le tirage et chacun devra tirer à nouveau."
+    : c==="tirage-back" ? "Les indices ne seront plus affichés." : "";
+  box.innerHTML=`<div class="row"><h2>Organisateur</h2><button type="button" class="ghost small" id="logout">Déconnexion</button></div>
+    <p class="small muted">${total} inscrit${total>1?"s":""}, ${done} tirage${done>1?"s":""} effectué${done>1?"s":""}. Tu peux retirer un inscrit avec la croix à côté de son prénom pendant les inscriptions.</p>
+    ${c ? `<p class="msg">${esc(confirmText)}</p>
+      <div class="confirm"><button type="button" class="green" id="cfYes">Confirmer</button><button type="button" class="ghost" id="cfNo">Annuler</button></div>`
+      : `<div class="actions">
+          ${next?`<button type="button" class="green" id="goNext" ${S.phase==="inscription"&&total<2?"disabled":""}>${next[1]}</button>`:""}
+          ${S.phase==="inscription"&&total<2?`<p class="small muted">Il faut au moins 2 inscrits pour lancer le tirage.</p>`:""}
+          ${back?`<button type="button" class="ghost" id="goBack">${back[1]}</button>`:""}
+        </div>`}
+    ${S.adminMsg?`<p class="msg">${esc(S.adminMsg)}</p>`:""}`;
+  $("logout").onclick = () => signOut(auth);
+  if(c){ $("cfYes").onclick = () => doPhase(c==="tirage-back"?"tirage":c); $("cfNo").onclick = () => { S.confirm=null; render(); }; }
+  else {
+    if($("goNext")) $("goNext").onclick = () => { S.confirm=next[0]; S.adminMsg=""; render(); };
+    if($("goBack")) $("goBack").onclick = () => { S.confirm = back[0]==="tirage" ? "tirage-back" : back[0]; S.adminMsg=""; render(); };
+  }
+}
+
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+async function doPhase(target){
+  S.confirm=null; S.adminMsg="";
+  try{
+    const batch = writeBatch(db);
+    if(target==="tirage" && S.phase==="inscription"){
+      // Une seule boucle : chacun offre au suivant. Personne ne se tire lui-même, chacun reçoit un seul cadeau.
+      const nums = (await getDocs(collection(db,"participants"))).docs.map(d=>d.id);
+      batch.set(doc(db,"tirage","attribution"), { order:shuffle(nums), at:serverTimestamp() });
+    }
+    if(target==="inscription"){
+      batch.delete(doc(db,"tirage","attribution"));
+      (await getDocs(collection(db,"tirages"))).forEach(d=>batch.delete(d.ref));
+    }
+    batch.set(doc(db,"config","etat"), { phase:target });
+    await batch.commit();
+  }catch(e){ console.error(e); S.adminMsg="Action refusée. Vérifie que tu es bien connecté avec l'e-mail inscrit dans les règles Firestore."; }
+  render();
+}
+
+async function onLogin(ev){
+  ev.preventDefault();
+  const m=$("loginMsg");
+  try{ await signInWithEmailAndPassword(auth, $("adEmail").value.trim(), $("adPass").value); }
+  catch(e){ m.hidden=false; m.textContent="E-mail ou mot de passe incorrect."; }
+}
+
+// --------- actions participants ---------
 async function onRegister(ev){
   ev.preventDefault();
   const msg=$("regMsg"), btn=$("regBtn");
   const name=$("regName").value.trim(), keywords=[1,2,3,4,5].map(i=>$("kw"+i).value.trim());
   const fail = t => { msg.hidden=false; msg.textContent=t; btn.disabled=false; btn.textContent="Je participe"; };
   if(!name || keywords.some(k=>!k)) return fail("Remplis ton prénom et les 5 mots clés.");
-  if(phase()!=="register") return fail("Les inscriptions sont closes.");
+  if(S.phase!=="inscription") return fail("Les inscriptions sont closes.");
   btn.disabled=true; btn.textContent="Inscription…";
   try{
     let num=null;
@@ -259,24 +340,7 @@ async function onRegister(ev){
     store.set("tombola-num", num);
     S.parts[num] = { num, name, keywords };
     render();
-  }catch(e){ console.error(e); fail("L'inscription n'est pas passée. Vérifie ta connexion et réessaie."); }
-}
-
-function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-
-async function getAssignment(){
-  const ref = doc(db,"tirage","attribution");
-  const snap = await getDoc(ref);
-  if(snap.exists()) return snap.data().order;
-  const nums = (await getDocs(collection(db,"participants"))).docs.map(d=>d.id);
-  // Une seule boucle : chacun offre au suivant. Personne ne se tire lui-même, chacun reçoit un seul cadeau.
-  const proposed = shuffle(nums);
-  return runTransaction(db, async tx => {
-    const s = await tx.get(ref);
-    if(s.exists()) return s.data().order;      // quelqu'un l'a créée juste avant nous
-    tx.set(ref, { order:proposed, at:serverTimestamp() });
-    return proposed;
-  });
+  }catch(e){ console.error(e); fail("L'inscription n'est pas passée. Les inscriptions sont peut-être closes, ou ta connexion a coupé."); }
 }
 
 async function onDraw(ev){
@@ -284,38 +348,48 @@ async function onDraw(ev){
   const val = $("drawNum").value.trim(); S.err="";
   if(!/^\d{3}$/.test(val)){ S.err="Entre ton numéro à 3 chiffres."; return render(); }
   if(!S.parts[val]){ S.err="Ce numéro n'existe pas. Vérifie-le."; return render(); }
-  if(partList().length<2){ S.err="Il faut au moins 2 participants."; return render(); }
   S.busy=true; render();
   try{
-    const order = await getAssignment();
+    const snap = await getDoc(doc(db,"tirage","attribution"));
+    const order = snap.exists() ? snap.data().order : [];
     const i = order.indexOf(val);
     if(i<0) throw new Error("absent");
     const target = S.parts[order[(i+1)%order.length]];
+    if(!target) throw new Error("absent");
     const dref = doc(db,"tirages",val);
     if(!(await getDoc(dref)).exists()) await setDoc(dref, { at:serverTimestamp() });
     store.set("tombola-num", val);
     S.result = { name:target.name, keywords:target.keywords, num:target.num };
   }catch(e){
     console.error(e);
-    S.err = e.message==="absent" ? "Ce numéro n'était pas dans la liste du tirage. Préviens l'organisateur." : "Le tirage n'a pas abouti. Vérifie ta connexion et réessaie.";
+    S.err = e.message==="absent" ? "Ce numéro n'est pas dans le tirage. Préviens l'organisateur." : "Le tirage n'a pas abouti. Vérifie ta connexion et réessaie.";
   }
   S.busy=false; render();
 }
 
 document.addEventListener("click", async ev=>{
-  const b = ev.target.closest("[data-copy]"); if(!b) return;
-  try{ await navigator.clipboard.writeText(b.dataset.copy); b.textContent="Copié"; }catch(e){ b.textContent=b.dataset.copy; }
+  const c = ev.target.closest("[data-copy]");
+  if(c){ try{ await navigator.clipboard.writeText(c.dataset.copy); c.textContent="Copié"; }catch(e){ c.textContent=c.dataset.copy; } return; }
+  const d = ev.target.closest("[data-del]");
+  if(d && S.admin){
+    if(d.dataset.sure!=="1"){ d.dataset.sure="1"; d.textContent="Retirer ?"; d.style.fontSize="13px"; return; }
+    try{ await deleteDoc(doc(db,"participants",d.dataset.del)); }catch(e){ S.adminMsg="Suppression refusée."; render(); }
+  }
 });
+window.addEventListener("hashchange", ()=>{ S.adminWanted = location.hash==="#admin"; render(); });
 
 // --------- données en direct ---------
 const offline = setTimeout(()=>{ if(!S.loaded) $("main").innerHTML=`<h2>Connexion impossible</h2><p class="muted">Les données ne répondent pas. Vérifie ta connexion puis recharge la page.</p>`; }, 10000);
+onSnapshot(doc(db,"config","etat"), s => {
+  const p = s.exists() ? s.data().phase : "inscription";
+  if(p!==S.phase){ S.phase=p; S.view=""; S.err=""; if(p==="inscription") S.result=null; }
+  render();
+}, e => console.error(e));
 onSnapshot(collection(db,"participants"), s => {
   const o={}; s.forEach(d=>o[d.id]=d.data()); S.parts=o; S.loaded=true; clearTimeout(offline); render();
 }, e => { console.error(e); $("main").innerHTML=`<h2>Accès refusé</h2><p class="muted">Vérifie les règles Firestore (voir README).</p>`; });
 onSnapshot(collection(db,"tirages"), s => { S.draws=s.size; render(); }, e=>console.error(e));
-
-let lastPhase = phase();
-setInterval(()=>{ const p=phase(); if(p!==lastPhase){ lastPhase=p; S.view=""; } render(); }, 30000);
+onAuthStateChanged(auth, u => { S.admin = !!u; $("adminBox").dataset.v=""; render(); });
 </script>
 </body>
 </html>
